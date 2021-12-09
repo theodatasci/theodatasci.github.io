@@ -1,0 +1,98 @@
+---
+title: "Theory-driven Analysis for Ecological Data"
+description: "FRB-CESAB & GdR TheoMoDive Workshop"
+author:
+  - name: "Vincent Calcagno"
+    url: https://vcalcagnoresearch.wordpress.com/
+    affiliation: INRAE Institut Sophia Agrobiotech
+    affiliation_url: https://www6.paca.inrae.fr/institut-sophia-agrobiotech
+    orcid_id: 0000-0002-5781-967X
+  - name: "Emanuel A. Fronhofer"
+    url: https://www.emanuelfronhofer.net/
+    affiliation: CNRS ISEM
+    affiliation_url: https://isem-evolution.fr/en/
+    orcid_id: 0000-0002-2219-784X
+  - name: "Isabelle Gounand"
+    url: https://isabellegounand.wordpress.com/
+    affiliation: CNRS iEES-Paris
+    affiliation_url: https://iees-paris.fr/teams/interaction-networks/
+    orcid_id: 0000-0002-0675-3973
+  - name: "François Massol"
+    url: https://spici.weebly.com/francois-massol.html
+    affiliation: CNRS CIIL
+    affiliation_url: https://www.ciil.fr/
+    orcid_id: 0000-0002-4098-955X
+date: "`r format(Sys.Date(), '%m-%d-%Y')`"
+site: distill::distill_website
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+
+![](img/banner-theodatasci_150dpi.png)
+
+
+
+<br />
+
+
+The objective of this five-day workshop, co-organized by the 
+[FRB-CESAB](https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/) 
+and the 
+[GdR TheoMoDive](https://sete-moulis-cnrs.fr/en/research/centre-for-biodiversity-theory-and-modelling/theomodive).
+is to train young researchers in theory-based approaches to model ecological data 
+(e.g. temporal series, macroecology, interaction and trophic network, etc.).
+
+
+
+<br />
+
+
+
+## Programme
+
+
+Coming soon...
+
+
+
+
+
+<br/>
+
+
+
+## Pré-requis
+
+
+
+Coming soon...
+
+
+
+## Corrections {.appendix}
+
+
+If you see mistakes or want to suggest changes, please 
+[Create an issue](https://github.com/theodatasci/theodatasci.github.io/issues)
+on the source repository.
+
+
+
+## Reuse {.appendix}
+
+
+The material of this website is licensed under Creative Commons Attribution [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+Source code is available at https://github.com/theodatasci/theodatasci.github.io/.
+
+
+
+## Citation {.appendix}
+
+
+
+Calcagno V, Fronhofer EA, Gounand I & Massol F (2022) 
+Workshop FRB-CESAB & GdR TheoMoDive: Theory-driven Analysis for Ecological Data (Edition 2022). 
