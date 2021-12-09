@@ -9,3 +9,5 @@ and the
 [GdR TheoMoDive](https://sete-moulis-cnrs.fr/en/research/centre-for-biodiversity-theory-and-modelling/theomodive).
 
 This website is built with the R package [`distill`](https://rstudio.github.io/distill/).
+
+The website is available at: **https://theodatasci.github.io**
