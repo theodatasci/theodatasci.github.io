@@ -18,7 +18,7 @@ author:
     affiliation_url: https://iees-paris.fr/teams/interaction-networks/
     orcid_id: 0000-0002-0675-3973
   - name: "François Massol"
-    url: https://spici.weebly.com/francois-massol.html
+    url: https://sites.google.com/a/polytechnique.org/francoismassol/home
     affiliation: CNRS CIIL
     affiliation_url: https://www.ciil.fr/
     orcid_id: 0000-0002-4098-955X

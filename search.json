@@ -19,12 +19,12 @@
         },
         {
           "name": "François Massol",
-          "url": "https://spici.weebly.com/francois-massol.html"
+          "url": "https://sites.google.com/a/polytechnique.org/francoismassol/home"
         }
       ],
       "date": "`r format(Sys.Date(), '%m-%d-%Y')`",
       "contents": "\n\n\nThe objective of this five-day workshop, co-organized by the FRB-CESAB and the GdR TheoMoDive. is to train young researchers in theory-based approaches to model ecological data (e.g. temporal series, macroecology, interaction and trophic network, etc.).\n\nProgramme\nComing soon…\n\nPré-requis\nComing soon…\nCorrections\nIf you see mistakes or want to suggest changes, please Create an issue on the source repository.\nReuse\nThe material of this website is licensed under Creative Commons Attribution CC BY 4.0. Source code is available at https://github.com/theodatasci/theodatasci.github.io/.\nCitation\nCalcagno V, Fronhofer EA, Gounand I & Massol F (2022) Workshop FRB-CESAB & GdR TheoMoDive: Theory-driven Analysis for Ecological Data (Edition 2022).\n\n\n\n",
-      "last_modified": "2021-12-09T16:19:29+01:00"
+      "last_modified": "2021-12-09T16:41:28+01:00"
     }
   ],
   "collections": []
