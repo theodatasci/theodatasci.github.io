@@ -14,17 +14,9 @@ navbar:
     - icon: fa fa-home
       href: index.html
     - text: "Instructions"
-      href: ""
-    - text: "Courses"
-      menu:
-      - text: "Coming soon"
-        href: ""
-    - text: "Exercises"
-      menu:
-      - text: "Coming soon"
-        href: ""
-    - text: "Ressources"
-      href: ""
+      href: instructions.html
+    - text: "Resources"
+      href: resources.html
     - icon: fab fa-github
       href: https://github.com/theodatasci/theodatasci.github.io/
 output: distill::distill_article
