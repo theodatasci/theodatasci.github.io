@@ -1,0 +1,417 @@
+---
+title: "Fitting demographic models onto a time series"
+author: "Camille Saade"
+date: "17/05/2022"
+output: html_document
+---
+
+This course is largely inspired by Benjamin Rosenbaum's work:
+https://benjamin-rosenbaum.github.io/fitting_deterministic_population_models/logistic_obs.html
+
+In this course, we'll see how to fit a demographic model onto experimental data. We'll first illustrate the method with a simple example: fitting a logistic growth on a single-species time series. You'll then get to adapt this code to more complicated cases (e.g., multispecific systems with several replicates).
+
+We can already clean our environment and load libraries that will be common to all examples:
+```{r}
+# cleaning the env:
+rm(list = ls())
+# loading libraries:
+library(rstan) #  for the stats
+library(ggplot2) # for some plots
+library(coda) # diagnostic of mcmc output
+library(deSolve) # to integrate ODEs
+```
+
+# I - Minimal exemple: logistic growth
+
+Let us first try to fit a logistic model onto a toy time-series.
+
+## a) Logistic model
+As a reminder, the logistic growth model is written as:
+$$\dfrac{dn}{dt} = rn(1-n/K)$$
+where $n$ is the population density of a species with growth rate $r$ and carrying capacity $K$.
+
+## b) Data
+We have a dataset containing the density over time of a species in two different replicates
+```{r}
+full_data = read.csv('Data/logistic.csv')
+head(full_data)
+```
+
+```{r}
+ggplot(data = full_data) +
+  geom_point(mapping = aes(x = time, y = density, color = as.factor(replicate))) +
+  theme_classic()
+```
+
+For simplicity, we'll only fit the data to a single replicate (we'll discuss how to fit a single model on several replicates during the practice session).
+```{r}
+full_data = full_data[full_data$replicate == 1,]
+```
+
+
+Lastly, stan requires that the data is in the shape of a named list:
+```{r}
+data_stan = list(n = length(unique(full_data$time)), # the number of observations
+                 t = full_data$time, # the vector of times
+                 N = full_data$density) # the vector of densities
+```
+
+## c) Stan model declaration and compilation
+We write the stan model as a C code string:
+```{r}
+
+logistic_model_str = '
+functions{
+  real[] odemodel(real t, real[] N, real[] p, real[] x_r, int[] x_i){
+    // p[1]=r, p[2]=K
+    real dNdt[1];
+    dNdt[1] = p[1]*(1-(N[1]/p[2]))*N[1];
+    return dNdt;
+  }
+}
+
+data{
+  int n; // number of observations
+  real t[n]; // time
+  real N[n]; // observations
+}
+
+parameters{
+  real<lower=0> r; // growth rate
+  real<lower=0> K; // carrying capacity
+  real<lower=0> sdev; // error term
+  real<lower=0> N0sim; // initial density distribution
+}
+
+model{
+  real p[2]; // vector of parameters for the ODE
+  real Nsim[n-1,1]; // simulated values, matrix. dim1 = time without t0, dim2 = dim_ODE = 1
+  
+  // priors 
+  r ~ lognormal(-0.5,1);
+  K ~ lognormal(7,1);
+  N0sim ~ normal(0,10);
+  sdev ~ gamma(2,0.1);
+  
+  // parameters for integrator
+  p[1] = r;
+  p[2] = K;
+  
+
+  // integrate ODE
+  Nsim = integrate_ode_rk45(odemodel, {N0sim}, t[1], t[2:n], p, rep_array(0.0,0), rep_array(0,0));
+  // likelihood
+  N[1] ~ normal(N0sim, sdev);
+  for (i in 2:n){
+    N[i] ~ normal(Nsim[i-1], sdev);
+  }
+}
+
+generated quantities{
+  real alpha = r/K;
+}
+'
+```
+
+Don't worry if this chunk of code seems a bit obscure, we'll explain it bloc by bloc:
+
+### functions\{ \}
+This bloc contains necessary functions to fit the model, i.e. the population's growth equation (ODE) in our case.
+It is used for numerical integration in the likelyhood computation: in the "model" bloc, we integrate odemodel for a given parameter combination and compare the real data to the values obtained through integration.
+
+Stan requires the exact format of parameters and output as written here (see stan documentation: https://mc-stan.org/docs/2_19/stan-users-guide/coding-an-ode-system.html): the time 't', state of the system 'N' and parameters 'p'. The last two parameters are required by rstan to pass additional data into the function, but won't be used here.
+
+```
+functions{
+  real[] odemodel(real t, real[] N, real[] p, real[] x_r, int[] x_i){
+    // p[1]=r, p[2]=K
+    real dNdt[1];
+    dNdt[1] = p[1]*(1-(N[1]/p[2]))*N[1];
+    return dNdt;
+  }
+}
+```
+
+### data\{ \}
+
+In this bloc, declare the format in which you will pass your data to Stan with their type and dimension. We chose to write the number of observations as 'n' and the times and densities as vectors ('t', 'N') of length 'n'.
+
+```
+data{
+  int n; // number of observations
+  real t[n]; // time
+  real N[n]; // observations
+}
+```
+
+### parameters\{ \}
+Here, declare the type, name and dimension of the model parameters. We need to estimate the logistic growth parameters ('r' and 'K') and a parameter describing the distribution of the residuals ('sdev': the standard deviation of a normal distribution). We also infer the initial state of the time series ('N0') as its true state is unknown and using the observed state would cause the observation error to cascade down the predictions.
+All parameters are positive, which we specify in the type declaration ('real<lower=0>').
+
+```
+parameters{
+  real<lower=0> r; // growth rate
+  real<lower=0> K; // carrying capacity
+  real<lower=0> sdev; // error term
+  real<lower=0> N0sim; // initial density distribution
+}
+```
+
+### model\{ \}
+This bloc is the core of the Stan model, where we specify how to compute likelihood as well as the parameters priors. Let's analyze it step by step.
+First, we declare variables that will be used to integrate the ODE: 'p' is an array that will store the ODE's parameters, and Nsim will store its outputs:
+
+```
+  real p[2]; // vector of parameters for the ODE
+  real Nsim[n-1,1]; // simulated values, matrix. dim1 = time without t0, dim2 = dim_ODE = 1
+```
+
+Then we declare priors for our parameters. As a rule of thumb, we want prior distributions to be informed by our knowledge of the system. For example, knowing that our time series converge to roughly 500 individuals, it would make no sense for the model to try out a K of 100000. By taking a look at our time series, we get an idea of our parameters range:
+- 'K' (the equilibrium density) is roughly in the 100-1000 range.
+- 'r' (the initial growth rate) is likely smaller than 1, as an 'r' of 1 would mean that the population doubles every unit of time at low density.
+- 'N0' is smaller than 50.
+We reflect this knowledge using the following priors:
+```
+  // priors 
+  r ~ lognormal(-0.5,1);
+  K ~ lognormal(7,1);
+  N0sim ~ normal(0,10);
+  sdev ~ gamma(2,0.1);
+```
+The log-normal distribution is usually a good idea for parameters that do not need to get to close to 0. The gamma distribution is very flexible and playing around with its parameters allows us to get a distribution where the parameter can get arbitriraly close to 0. We won't detail other possible prior functions, but don't hesitate to check the rstan documentation on priors when setting up your own model: https://mc-stan.org/docs/2_29/functions-reference/continuous-distributions.html#continuous-distributions
+
+We can quickly check our prior distribution visually: it should include the ranges we estimated.
+K prior looks like this:
+```{r}
+x_K = seq(0, 3000, length.out = 200)
+prior_K = dlnorm(x_K, 7, 1)
+ggplot() +
+  geom_ribbon(mapping = aes(x = x_K, ymin = 0, ymax = prior_K), alpha = 0.1) +
+  geom_line(mapping = aes(x = x_K, y = prior_K)) +
+  xlab('K') +
+  ylab('Prior probability density') +
+  theme_classic()
+```
+
+And r prior:
+```{r}
+x_r = seq(0, 2, length.out = 200)
+prior_r = dlnorm(x_r, -0.5, 1)
+ggplot() +
+  geom_ribbon(mapping = aes(x = x_r, ymin = 0, ymax = prior_r), alpha = 0.1) +
+  geom_line(mapping = aes(x = x_r, y = prior_r)) +
+  xlab('r') +
+  ylab('Prior probability density') +
+  theme_classic()
+```
+
+
+Now that the priors are defined, we can go on to integrating the ODE an computing the likelihood.
+First we store the ODE parameters in the vector 'p', then we integrate the ODE using the function 'integrate_ode_rk45'. The predicted time series is stored in 'Nsim'.
+Lastely, we compute the likelihood using this time series.
+Likelihood is defined by a normal distribution: for each observation 'Nsim[i]', the likelihood follows a norma law centered on 'Nsim[i-1]' (mind the index gap).
+
+```
+  // parameters for integrator
+  p[1] = r;
+  p[2] = K;
+  
+
+  // integrate ODE
+  Nsim = integrate_ode_rk45(odemodel, {N0sim}, t[1], t[2:n], p, rep_array(0.0,0), rep_array(0,0));
+  // likelihood
+  N[1] ~ normal(N0sim, sdev);
+  for (i in 2:n){
+    N[i] ~ normal(Nsim[i-1], sdev);
+  }
+```
+
+### generated quantities\{\}
+Lastly we can ask the model to compute additional quantities from the estimated parameters. We don't really need it in this case but for the sake of exemple let's ask for the $\alpha$ parameter which is equal to r over K:
+
+```
+generated quantities{
+  real alpha = r/K;
+}
+```
+
+### Model compilation
+Now that the model is written, we can compile it:
+```{r message=FALSE, warning=FALSE}
+logistic_model = stan_model(model_code = logistic_model_str, auto_write = TRUE)
+```
+
+## d) Model fit
+We can finally fit the model. We start by declaring some model parameters. Because the logistic model is fairly simple, we don't need too many samples to estimate the parameters so we'll only use 3 chains of 2000 samples each (+ 2000 warmup steps that we'll throw away)
+
+```{r}
+# stan options
+chains = 3
+options(mc.cores = chains)
+iter   =  4000
+warmup =  2000
+```
+
+We must also declare the values on which Stan will start the parameter estimation:
+```{r}
+# initial values for sampling 
+init=rep(list(list(r=0.1,
+                   K=400,
+                   N0sim=data_stan$N[1],
+                   sdev=1))
+         ,chains)
+```
+
+And lastly, we fit the model:
+```{r}
+fit = sampling(logistic_model,
+               data=data_stan,
+               iter=iter,
+               warmup=warmup,
+               chains=chains,
+               init=init
+)
+```
+
+## e) Model diagnostic
+Once the fit is done, it is important to inspect the samples to ensure there are no pathological behaviors in the chain and that the estimates are correct.
+
+### Effective number of samples and rhat
+The first thing to do is to look at the summary of our fit object, using the function print. A good indicator that the model converged correctly is a high effective number of samples (n_eff) and a Rhat close to 1 (Rhat < 0.01):
+```{r}
+print(fit, digits = 3)
+```
+
+### Trace plot and density plot
+We can also plot the trace and density of all parameters to check for anomalies. Density plots are ideally unimodal, and trace plots should show that the chains are well mixed:
+```{r}
+samples=As.mcmc.list(fit)
+plot(samples[, c("r","K")])
+```
+
+### Pair plot
+We take a look at pair plots of parameters distribution to check that they are not correlated. Strongly correlated parameters are often non-identifiable as is results in many combination of parameters having the same likelihood, also called a "likelihood ridge":
+```{r}
+pairs(fit, pars=c("r","K"))
+```
+
+### Priors vs. posteriors
+Lastly, we can plot the distribution of priors and posteriors to check that the model indeed gained information from the data.
+Prior vs. posterior for K:
+```{r}
+ggplot() +
+  geom_ribbon(mapping = aes(x = x_K, ymin = 0, ymax = prior_K), alpha = 0.2) +
+  geom_line(mapping = aes(x = x_K, y = prior_K)) +
+  geom_density(data = as.data.frame(fit), mapping = aes(x = K), color = 'green', fill = 'green', alpha = 0.2) +
+  xlab('K') +
+  ylab('Prior/posterior probability density') +
+  theme_classic()
+```
+
+for r:
+```{r}
+ggplot() +
+  geom_ribbon(mapping = aes(x = x_r, ymin = 0, ymax = prior_r), alpha = 0.2) +
+  geom_line(mapping = aes(x = x_r, y = prior_r)) +
+  geom_density(data = as.data.frame(fit), mapping = aes(x = r), color = 'green', fill = 'green', alpha = 0.2) +
+  xlab('r') +
+  ylab('Prior/posterior probability density') +
+  theme_classic()
+```
+
+## f) Posterior predictions
+Lastly, we can use the posterior distribution of parameters to make predictions. Here, we'll use the inferred r, K and N0 to predict the median and confidence interval of the true time series.
+Let's first declare the function 'ode.model' which returns the derivative of the logistic model. We'll use it later to predict dynamics from the infered parameters:
+
+
+```{r}
+ode.model = function(t,N,p){
+  dNdt =  p[1]*N[1]*(1.0-N[1]/p[2])
+  return(list(dNdt))
+}
+```
+
+Then we sample 1000 parameters combinations from the posterior distribution. we use these parameters to integrate the logistic model and store the resulting dynamics in a dataframe called "predictions".
+
+```{r}
+posteriors = as.matrix(fit)
+head(posteriors)
+```
+```{r}
+n_post = 1000
+times = seq(min(full_data$time), max(full_data$time), length.out = 40)
+
+for (k in 1:n_post){
+  par = posteriors[sample(1:nrow(posteriors), 1),]
+  sim = ode(par['N0sim'], times, ode.model, c(par['r'], par['K']))
+  
+  temp  = data.frame(time = sim[,1], density = sim[,2], id = k)
+  
+  if (k == 1) {
+    predictions = temp
+  } else {
+    predictions = rbind(predictions, temp)
+  }
+  
+}
+```
+
+Just to make sure that the predictions seem correct, let us plot them all in a single plot:
+```{r}
+ggplot() +
+  geom_point(data = full_data[full_data$replicate == 1,], mapping = aes(x = time, y = density)) +
+  geom_line(data = predictions, mapping = aes(x = time, y = density, group = id), alpha = 0.01) +
+  theme_classic()
+```
+
+
+We can finally plot the median and confidence interval (0.05-0.95) of all the predictions:
+```{r}
+ggplot() +
+  geom_point(data = full_data[full_data$replicate == 1,], mapping = aes(x = time, y = density)) +
+  stat_summary(data = predictions,
+               fun.min = function(x) quantile(x, 0.05),
+               fun.max = function(x) quantile(x, 0.95),
+               mapping = aes(x = time, y = density),
+               geom = 'ribbon', alpha = 0.1) +
+  stat_summary(data = predictions,
+               fun = median,
+               mapping = aes(x = time, y = density),
+               geom = 'line') +
+  theme_classic()
+```
+
+# II - Practice
+
+## a) Data description
+Three datasets are available to you:
+
+- epidemio.csv: Dynamics of an infectious disease: density over time of susceptible (S), infected (I) and recovered (R) inidividuals in 6 populations of similar sizes.
+- competition.csv: Dynamics of two species in competition: density over time of species n1 and n2 in 6 different locations.
+- predator\_prey.csv: Dynamics of a trophic system: density over time of a prey (n) and its predator (p) in 6 different locations.
+
+## b) Instructions
+To help you navigate the fitting, here are some suggestions:
+
+### Before you fit anything
+- Chose one of the available datasets (preferably not all the same !). Before diving into fitting, make sure you understand the data structure and inspect it visually through plots.
+
+- Think about which demographic model could fit your model and why. Write down its ODE and parameters parameters you need to estimate.
+
+### Fit a model on a single replicate
+To start with a simpler task, subset your data to keep only one of the replicates, and adapt the code from the minimal example above to fit onto your problem. In particular, in the declaration of the stan model you should modify:
+
+- the "function" bloc to include the ODE your wrote down above.
+- the "data" bloc to reflect the structure of your dataset.
+- the "parameters" bloc according to the parameters you wrote down above.
+- the "model" bloc. Pay particular attention to the prior declaration.
+
+You can then fit the model to the data and check...
+
+
+### Taking advantage of the replication: fitting a model on multiple time-series at once
+
+If you have some time left, you can try fitting a single set of parameters on all the replicates at once. Benjamin Rosenbaum describes an elegant way to do that for a logistic example: https://benjamin-rosenbaum.github.io/fitting_deterministic_population_models/logistic_obs.html
+
+
+
