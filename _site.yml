@@ -23,16 +23,16 @@ navbar:
         href: "https://www.ecotheory.ca/theorydata/datatheory.html"
       - text: "Kim Cuddington video"
         href: "https://www.dropbox.com/s/6kjbkylojgi6ke8/Cuddington160522_theorydata.mp4?dl=0"
-      - text: "Time series"
+      - text: "Camille Saade talk"
+        hre: "courses/time-series/camille/Time_series.html"
+      - text: "Benjamin Rosenbaum talk"
         href: "courses/time-series/benjamin/time_series_data_talk.pdf"
       - text: "Frédéric Barraquand talk"
-        href: "https://github.com/fbarraquand/overcompensating-popdyn-models/blob/main/popdyn-vole-models.pdf"
+        href: "https://raw.githubusercontent.com/fbarraquand/overcompensating-popdyn-models/main/popdyn-vole-models.pdf"
     - text: "Exercises"
       menu:
       - text: "Confronting population models with time series data"
         href: "courses/time-series/benjamin/time_series_data_R.pdf"
-      - text: "Fitting demographic models onto a time series"
-        href: "courses/time-series/camille/Time_series.html"
     - text: "Resources"
       href: resources.html
     - icon: fab fa-github
