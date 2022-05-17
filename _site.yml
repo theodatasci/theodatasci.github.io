@@ -24,7 +24,7 @@ navbar:
       - text: "Kim Cuddington video"
         href: "https://www.dropbox.com/s/6kjbkylojgi6ke8/Cuddington160522_theorydata.mp4?dl=0"
       - text: "Camille Saade talk"
-        hre: "courses/time-series/camille/Time_series.html"
+        href: "courses/time-series/camille/Time_series.html"
       - text: "Benjamin Rosenbaum talk"
         href: "courses/time-series/benjamin/time_series_data_talk.pdf"
       - text: "Frédéric Barraquand talk"
