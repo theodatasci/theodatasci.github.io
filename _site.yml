@@ -15,6 +15,22 @@ navbar:
       href: index.html
     - text: "Instructions"
       href: instructions.html
+    - text: "Courses"
+      menu:
+      - text: "Theoretical modeling"
+        href: "courses/theo-modeling/Day1_TAED.pdf"
+      - text: "Kim Cuddington talk"
+        href: "https://www.ecotheory.ca/theorydata/datatheory.html"
+      - text: "Kim Cuddington video"
+        href: "https://www.dropbox.com/s/6kjbkylojgi6ke8/Cuddington160522_theorydata.mp4?dl=0"
+      - text: "Time series"
+        href: "courses/time-series/benjamin/time_series_data_talk.pdf"
+    - text: "Exercises"
+      menu:
+      - text: "Confronting population models with time series data"
+        href: "courses/time-series/benjamin/time_series_data_R.pdf"
+      - text: "Fitting demographic models onto a time series"
+        href: "courses/time-series/camille/Time_series.html"
     - text: "Resources"
       href: resources.html
     - icon: fab fa-github
