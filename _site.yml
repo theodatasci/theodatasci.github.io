@@ -17,12 +17,16 @@ navbar:
       href: instructions.html
     - text: "Courses"
       menu:
-      - text: "Theoretical modeling"
+      - text: "DAY 1"
+      - text: "Isabelle Gounand talk"
         href: "courses/theo-modeling/Day1_TAED.pdf"
       - text: "Kim Cuddington talk"
         href: "https://www.ecotheory.ca/theorydata/datatheory.html"
       - text: "Kim Cuddington video"
         href: "https://www.dropbox.com/s/6kjbkylojgi6ke8/Cuddington160522_theorydata.mp4?dl=0"
+      - text: "DAY 2"
+      - text: "Emmanuel Fronhofer talk"
+        href: "courses/time-series/emmanuel/fronhofer_day2_cesab_theomodive.pdf"
       - text: "Camille Saade talk"
         href: "courses/time-series/camille/Time_series.html"
       - text: "Benjamin Rosenbaum talk"
