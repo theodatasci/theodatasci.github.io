@@ -25,6 +25,8 @@ navbar:
         href: "https://www.dropbox.com/s/6kjbkylojgi6ke8/Cuddington160522_theorydata.mp4?dl=0"
       - text: "Time series"
         href: "courses/time-series/benjamin/time_series_data_talk.pdf"
+      - text: "Frédéric Barraquand talk"
+        href: "https://github.com/fbarraquand/overcompensating-popdyn-models/blob/main/popdyn-vole-models.pdf"
     - text: "Exercises"
       menu:
       - text: "Confronting population models with time series data"
