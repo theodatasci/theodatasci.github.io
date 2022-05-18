@@ -34,6 +34,8 @@ navbar:
       - text: "Frédéric Barraquand talk"
         href: "https://raw.githubusercontent.com/fbarraquand/overcompensating-popdyn-models/main/popdyn-vole-models.pdf"
       - text: "DAY 3"
+      - text: "Vincent Calcagno talk"
+        href: "courses/spatial-data/TDAED_slides.pdf"
       - text: "DAY 4"
       - text: "François Massol talk"
         href: "courses/networks/Day4_Networks.pdf"
