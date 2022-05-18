@@ -1,0 +1,227 @@
+---
+title: "Solution: Competitive lotka-volterra"
+author: "Camille Saade"
+date: "17/05/2022"
+output: html_document
+---
+
+# I - Data importation
+```{r}
+# cleaning the env:
+rm(list = ls())
+# loading libraries:
+library(rstan) #  for the stats
+library(ggplot2) # for some plots
+library(coda) # diagnostic of mcmc output
+library(deSolve) # to integrate ODEs
+```
+
+
+```{r}
+## importing data
+data = read.csv('Data/competiton.csv')
+head(data)
+
+```
+
+
+```{r}
+# keeping only 1 replicate for the fit
+repl = 1
+data_stan = list(
+  n = length(unique(data$time)),
+  t = data$time[data$replicate == repl],
+  n1 = data$n1[data$replicate == repl],
+  n2 = data$n2[data$replicate == repl]
+)
+
+```
+
+# II - Model declaration
+```{r}
+
+model_str = '
+functions{
+  real[] odemodel(real t, real[] N, real[] p, real[] x_r, int[] x_i){
+    // p[1]=r1, p[2] = r2, p[3] = K1, p[4] = K2, p[5] = alpha1, p[6] = alpha2 
+    real dNdt[2]; 
+    dNdt[1] = p[1]*N[1]*(1 - (N[1] + p[5]*N[2])/p[3]);
+    dNdt[2] = p[2]*N[2]*(1 - (p[6]*N[1] + N[2])/p[4]);
+    return dNdt;
+  }
+}
+
+data{
+  int n; // number of observations
+  real t[n]; // time
+  real n1[n]; // observations n1
+  real n2[n]; // observations n2
+}
+
+parameters{
+  real<lower=0> r1; // growth rate
+  real<lower=0> r2; // growth rate
+  real<lower=0> K1; // carrying capacity
+  real<lower=0> K2; // carrying capacity
+  real<lower=0> alpha1; // comp term
+  real<lower=0> alpha2; // comp term
+  real<lower=0> n10sim; // initial density n1
+  real<lower=0> n20sim; // initial density n2
+  real<lower=0> sdev;
+}
+
+model{
+  real p[6]; // vector of parameters for the ODE
+  real simval[n-1,2]; // simulated values, matrix. dim1 = time without t0, dim2 = dim_ODE = 2 (S = 1, I = 2)
+  
+  // priors 
+  r1 ~ lognormal(-0.5,1);
+  r2 ~ lognormal(-0.5,1);
+  K1 ~ lognormal(5.5, 1);
+  K2 ~ lognormal(5.5, 1);
+  alpha1 ~ lognormal(0.5,1);
+  alpha2 ~ lognormal(0.5,1);
+  n10sim ~ normal(n1[1],30);
+  n20sim ~ normal(n2[1],30);
+  sdev ~ gamma(2,0.1);
+  
+  // parameters for integrator
+  p[1] = r1;
+  p[2] = r2;
+  p[3] = K1;
+  p[4] = K2;
+  p[5] = alpha1;
+  p[6] = alpha2;
+
+  // integrate ODE
+  simval = integrate_ode_rk45(odemodel, {n10sim, n20sim}, t[1], t[2:n], p, rep_array(0.0,0), rep_array(0,0));
+  // likelihood
+  n1[1] ~ normal(n10sim, sdev);
+  n2[1] ~ normal(n20sim, sdev);
+  for (i in 2:n){
+    n1[i] ~ normal(simval[i-1, 1], sdev);
+    n2[i] ~ normal(simval[i-1, 2], sdev);
+  }
+}
+
+generated quantities{
+}
+'
+
+```
+
+```{r}
+model = stan_model(model_code = model_str, auto_write = TRUE)
+```
+
+# III - Fit
+```{r}
+# stan options
+chains = 3
+options(mc.cores = chains)
+iter   =  6000
+warmup =  4000
+
+# initial values for sampling 
+init=rep(list(list(r1=0.1,
+                   r2=0.2,
+                   K1 = 300,
+                   K2 = 200,
+                   alpha1 = 1,
+                   alpha2 = 1,
+                   n10sim=data_stan$n1[1],
+                   n20sim=data_stan$n2[1],
+                   sdev=1
+                   ))
+         ,chains)
+
+
+fit = sampling(model,
+               data=data_stan,
+               iter=iter,
+               warmup=warmup,
+               chains=chains,
+               init=init)
+```
+
+# IV - Diagnostics
+```{r}
+print(fit, digits = 3)
+```
+
+```{r}
+samples=As.mcmc.list(fit)
+params = c("r1","r2", "K1", "K2", "alpha1", "alpha2")
+plot(samples[, params])
+```
+
+```{r}
+pairs(fit, pars=params)
+```
+
+# V- posterior predictions
+
+```{r}
+ode.model = function(t,N,p){
+  r1 = p$r1
+  r2 = p$r2
+  K1 = p$K1
+  K2 = p$K2
+  alpha1 = p$alpha1
+  alpha2 = p$alpha2
+  dn1 = r1*N[1]*(1-(N[1]+alpha1*N[2])/K1)
+  dn2 = r2*N[2]*(1-(alpha2*N[1]+N[2])/K2)
+  return(list(c(dn1, dn2)))
+}
+
+posteriors = as.matrix(fit)
+
+n_post = 1000
+times = seq(min(data$time), max(data$time), length.out = 200)
+for (k in 1:n_post){
+  par = posteriors[sample(1:nrow(posteriors), 1),]
+  sim = ode(c(par['n10sim'], par['n20sim']),
+            times, ode.model, list(r1 = par['r1'], r2= par['r2'], K1 = par['K1'], K2 = par['K2'], alpha1 = par['alpha1'], alpha2 = par['alpha2']))
+  
+  temp  = data.frame(time = sim[,1], n1 = sim[,2], n2 = sim[,3], id = k)
+  
+  if (k == 1) {
+    predictions = temp
+  } else {
+    predictions = rbind(predictions, temp)
+  }
+  
+}
+```
+
+```{r}
+ggplot(data[data$replicate == repl,]) +
+  geom_point(mapping = aes(x = time, y = n1), color = 'blue') +
+  geom_point(mapping = aes(x = time, y = n2), color = 'red') +
+  geom_line(data = predictions, mapping = aes(x = time, y = n1, group = id), color = 'blue', alpha = 0.01) +
+  geom_line(data = predictions, mapping = aes(x = time, y = n2, group = id), color = 'red', alpha = 0.01) +
+  theme_classic()
+```
+
+
+```{r}
+ggplot(data[data$replicate == repl,]) +
+  geom_point(mapping = aes(x = time, y = n1), color = 'blue') +
+  geom_point(mapping = aes(x = time, y = n2), color = 'red') +
+  stat_summary(data = predictions, mapping = aes(x = time, y = n1),
+               fun.min = function(x) quantile(x, 0.05),
+               fun.max = function(x) quantile(x, 0.95),
+               geom = 'ribbon', fill = 'blue', alpha = 0.2) +
+  stat_summary(data = predictions, mapping = aes(x = time, y = n1),
+               fun = median,
+               geom = 'line', color = 'blue') +
+  stat_summary(data = predictions, mapping = aes(x = time, y = n2),
+               fun.min = function(x) quantile(x, 0.05),
+               fun.max = function(x) quantile(x, 0.95),
+               geom = 'ribbon', fill = 'red', alpha = 0.2) +
+  stat_summary(data = predictions, mapping = aes(x = time, y = n2),
+               fun = median,
+               geom = 'line', color = 'red') +
+  theme_classic()
+```
+
