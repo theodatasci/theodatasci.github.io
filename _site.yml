@@ -37,6 +37,8 @@ navbar:
       - text: "DAY 4"
       - text: "François Massol talk"
         href: "courses/networks/Day4_Networks.pdf"
+      - text: "Claire Jacquet talk"
+        href: "courses/networks/Claire/empirical_food_webs.pdf"
     - text: "Exercises"
       menu:
       - text: "Confronting population models with time series data"
