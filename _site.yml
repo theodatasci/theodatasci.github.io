@@ -36,6 +36,8 @@ navbar:
       - text: "DAY 3"
       - text: "Vincent Calcagno talk"
         href: "courses/spatial-data/TDAED_slides.pdf"
+      - text: "Maxime Dubart GitHub"
+        href: "https://github.com/mxdub/TMDSpatial_data"
       - text: "DAY 4"
       - text: "François Massol talk"
         href: "courses/networks/Day4_Networks.pdf"
