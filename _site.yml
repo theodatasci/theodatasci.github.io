@@ -38,6 +38,8 @@ navbar:
         href: "courses/spatial-data/TDAED_slides.pdf"
       - text: "Maxime Dubart GitHub"
         href: "https://github.com/mxdub/TMDSpatial_data"
+      - text: "Virginie Ravigné talk"
+        href: "courses/spatial-data/2022_05_18_CESAB.pdf"
       - text: "DAY 4"
       - text: "François Massol talk"
         href: "courses/networks/Day4_Networks.pdf"
