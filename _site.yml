@@ -45,6 +45,8 @@ navbar:
         href: "courses/networks/matthieu/MB_cesab.pdf"
       - text: "Claire Jacquet talk"
         href: "courses/networks/Claire/empirical_food_webs.pdf"
+      - text: "Sonia Kéfi talk"
+        href: "courses/networks/2022_05_cesab_Kefi.pdf"
     - text: "Exercises"
       menu:
       - text: "Confronting population models with time series data"
