@@ -114,7 +114,7 @@ Temporal series and dynamics in ecology
 &nbsp;&nbsp;&nbsp;&nbsp;`r fontawesome::fa_i("caret-right")` &nbsp;
 Spatial data, macro-ecology and co-occurrences
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;`r fontawesome::fa_i("caret-right")` &nbsp;
-**_Guest speaker_**: Virginie Ravigné (CIRAD, Montpellier)
+**_Guest speaker_**: Davide Martinetti (INRAE, Avignon)
 
 
 
