@@ -89,5 +89,5 @@ Source code is available at https://github.com/theodatasci/theodatasci.github.io
 
 
 
-Calcagno V, Fronhofer EA, Gounand I & Massol F (2022) 
-Workshop FRB-CESAB & GdR TheoMoDive: Theory-driven Analysis for Ecological Data (Edition 2022). 
+Calcagno V, Fronhofer EA, Gounand I, Jacquet C, Kéfi C & Massol F (2023) 
+Workshop FRB-CESAB & GdR TheoMoDive: Theory-driven Analysis for Ecological Data (Edition 2023). 

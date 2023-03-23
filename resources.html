@@ -786,6 +786,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   d-article table.gt_table td,
   d-article table.gt_table th {
     border-bottom: none;
+    font-size: 100%;
   }
 
   .html-widget {
@@ -1858,15 +1859,21 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
       // hoverable references
       $('span.citation[data-cites]').each(function() {
-        if ($(this).children()[0].nodeName == "D-FOOTNOTE") {
-          var fn = $(this).children()[0]
+        const citeChild = $(this).children()[0]
+        // Do not process if @xyz has been used without escaping and without bibliography activated
+        // https://github.com/rstudio/distill/issues/466
+        if (citeChild === undefined) return true
+
+        if (citeChild.nodeName == "D-FOOTNOTE") {
+          var fn = citeChild
           $(this).html(fn.shadowRoot.querySelector("sup"))
           $(this).id = fn.id
           fn.remove()
         }
         var refs = $(this).attr('data-cites').split(" ");
         var refHtml = refs.map(function(ref) {
-          return "<p>" + $('#ref-' + ref).html() + "</p>";
+          // Could use CSS.escape too here, we insure backward compatibility in navigator
+          return "<p>" + $('div[id="ref-' + ref + '"]').html() + "</p>";
         }).join("\n");
         window.tippy(this, {
           allowHTML: true,
@@ -2065,7 +2072,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </script>
 
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+  <script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
   <script src="site_libs/popper-2.6.0/popper.min.js"></script>
   <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -2103,43 +2110,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <i class="fa fa-home" aria-hidden="true"></i>
 </a>
 <a href="instructions.html">Instructions</a>
-<div class="nav-dropdown">
-<button class="nav-dropbtn">
-Courses
- 
-<span class="down-arrow">&#x25BE;</span>
-</button>
-<div class="nav-dropdown-content">
-<span class="nav-dropdown-header">DAY 1</span>
-<a href="courses/theo-modeling/Day1_TAED.pdf">Isabelle Gounand talk</a>
-<a href="https://www.ecotheory.ca/theorydata/datatheory.html">Kim Cuddington talk</a>
-<a href="https://www.dropbox.com/s/6kjbkylojgi6ke8/Cuddington160522_theorydata.mp4?dl=0">Kim Cuddington video</a>
-<span class="nav-dropdown-header">DAY 2</span>
-<a href="courses/time-series/emmanuel/fronhofer_day2_cesab_theomodive.pdf">Emmanuel Fronhofer talk</a>
-<a href="courses/time-series/camille/Time_series.html">Camille Saade talk</a>
-<a href="courses/time-series/benjamin/time_series_data_talk.pdf">Benjamin Rosenbaum talk</a>
-<a href="https://raw.githubusercontent.com/fbarraquand/overcompensating-popdyn-models/main/popdyn-vole-models.pdf">Frédéric Barraquand talk</a>
-<span class="nav-dropdown-header">DAY 3</span>
-<a href="courses/spatial-data/TDAED_slides.pdf">Vincent Calcagno talk</a>
-<a href="https://github.com/mxdub/TMDSpatial_data">Maxime Dubart GitHub</a>
-<a href="courses/spatial-data/2022_05_18_CESAB.pdf">Virginie Ravigné talk</a>
-<span class="nav-dropdown-header">DAY 4</span>
-<a href="courses/networks/Day4_Networks.pdf">François Massol talk</a>
-<a href="courses/networks/matthieu/MB_cesab.pdf">Matthieu Barbier talk</a>
-<a href="courses/networks/Claire/empirical_food_webs.pdf">Claire Jacquet talk</a>
-<a href="courses/networks/2022_05_cesab_Kefi.pdf">Sonia Kéfi talk</a>
-</div>
-</div>
-<div class="nav-dropdown">
-<button class="nav-dropbtn">
-Exercises
- 
-<span class="down-arrow">&#x25BE;</span>
-</button>
-<div class="nav-dropdown-content">
-<a href="courses/time-series/benjamin/time_series_data_R.pdf">Confronting population models with time series data</a>
-</div>
-</div>
+<a href="#">Courses</a>
+<a href="#">Exercises</a>
 <a href="resources.html">Resources</a>
 <a href="https://github.com/theodatasci/theodatasci.github.io/">
 <i class="fab fa-github" aria-hidden="true"></i>
@@ -2164,96 +2136,51 @@ Exercises
 <p><br/></p>
 <p><strong>Recommended papers</strong></p>
 <ul>
-<li><p>Cohen JE &amp; Briand F (1984) Trophic links of community
-foodwebs. <strong><em>PNAS</em></strong>, doi: <a
-href="https://doi.org/10.1073/pnas.81.13.4105">10.1073/pnas.81.13.4105</a>.
+<li><p>Cohen JE &amp; Briand F (1984) Trophic links of community foodwebs. <strong><em>PNAS</em></strong>, doi: <a href="https://doi.org/10.1073/pnas.81.13.4105">10.1073/pnas.81.13.4105</a>.
  <a href="biblio/cohen-1984.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Cohen JE &amp; Newman CM (1988) Dynamic basis of food web
-organization. <strong><em>Ecology</em></strong>, doi: <a
-href="https://doi.org/10.2307/1941142">10.2307/1941142</a>.  <a
-href="biblio/cohen-1988.pdf"><strong>PDF</strong></a></p></li>
-<li><p>de Ruiter PC, Neutel A-M &amp; Moore JC (1995) Energetics,
-patterns of interaction strengths, and stability in real ecosystems.
-<strong><em>Science</em></strong>, 269, doi: <a
-href="https://doi.org/10.1126/science.269.5228.1257">10.1126/science.269.5228.1257</a>.
+<li><p>Cohen JE &amp; Newman CM (1988) Dynamic basis of food web organization. <strong><em>Ecology</em></strong>, doi: <a href="https://doi.org/10.2307/1941142">10.2307/1941142</a>.
+ <a href="biblio/cohen-1988.pdf"><strong>PDF</strong></a></p></li>
+<li><p>de Ruiter PC, Neutel A-M &amp; Moore JC (1995) Energetics, patterns of interaction strengths, and stability in real ecosystems. <strong><em>Science</em></strong>, 269, doi: <a href="https://doi.org/10.1126/science.269.5228.1257">10.1126/science.269.5228.1257</a>.
  <a href="biblio/deruiter-1995.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Dunne JA, Williams RJ &amp; Martinez ND (2002) Network structure
-and biodiversity loss in food webs: robustness increases with
-connectance. <strong><em>Ecology Letters</em></strong>, doi: <a
-href="https://doi.org/10.1046/j.1461-0248.2002.00354.x">10.1046/j.1461-0248.2002.00354.x</a>.
+<li><p>Dunne JA, Williams RJ &amp; Martinez ND (2002) Network structure and biodiversity loss in food webs: robustness increases with connectance. <strong><em>Ecology Letters</em></strong>, doi: <a href="https://doi.org/10.1046/j.1461-0248.2002.00354.x">10.1046/j.1461-0248.2002.00354.x</a>.
  <a href="biblio/dunne-2002.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Grainger TN <em>et al.</em> (2022) An empiricist’s guide to using
-ecological theory. <strong><em>The American Naturalist</em></strong>,
-doi: <a href="https://doi.org/10.1086/717206">10.1086/717206</a>.  <a
-href="biblio/grainger-2022.pdf"><strong>PDF</strong></a></p></li>
-<li><p>James A <em>et al.</em> (2015) Constructing random matrices to
-represent real ecosystems. <strong><em>The American
-Naturalist</em></strong>, doi: <a
-href="https://doi.org/10.1086/680496">10.1086/680496</a>.  <a
-href="biblio/james-2015.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Leger J-B, Daudin J-J &amp; Vacher C (2015) Clustering methods
-differ in their ability to detect patterns in ecological networks.
-<strong><em>Methods in Ecology and Evolution</em></strong>, doi: <a
-href="https://doi.org/10.1111/2041-210X.12334">10.1111/2041-210X.12334</a>.
+<li><p>Grainger TN <em>et al.</em> (2022) An empiricist’s guide to using ecological theory. <strong><em>The American Naturalist</em></strong>, doi: <a href="https://doi.org/10.1086/717206">10.1086/717206</a>.
+ <a href="biblio/grainger-2022.pdf"><strong>PDF</strong></a></p></li>
+<li><p>James A <em>et al.</em> (2015) Constructing random matrices to represent real ecosystems. <strong><em>The American Naturalist</em></strong>, doi: <a href="https://doi.org/10.1086/680496">10.1086/680496</a>.
+ <a href="biblio/james-2015.pdf"><strong>PDF</strong></a></p></li>
+<li><p>Leger J-B, Daudin J-J &amp; Vacher C (2015) Clustering methods differ in their ability to detect patterns in ecological networks. <strong><em>Methods in Ecology and Evolution</em></strong>, doi: <a href="https://doi.org/10.1111/2041-210X.12334">10.1111/2041-210X.12334</a>.
  <a href="biblio/leger-2015.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Lewinsohn TM <em>et al.</em> (2006) Structure in plant-animal
-interaction assemblages. <strong><em>Oikos</em></strong>, doi: <a
-href="https://doi.org/10.1111/j.0030-1299.2006.14583.x">10.1111/j.0030-1299.2006.14583.x</a>.
+<li><p>Lewinsohn TM <em>et al.</em> (2006) Structure in plant-animal interaction assemblages. <strong><em>Oikos</em></strong>, doi: <a href="https://doi.org/10.1111/j.0030-1299.2006.14583.x">10.1111/j.0030-1299.2006.14583.x</a>.
  <a href="biblio/lewinsohn-2006.pdf"><strong>PDF</strong></a></p></li>
-<li><p>May RM (1972) Will a large complex system be stable?
-<strong><em>Nature</em></strong>, doi: <a
-href="https://doi.org/10.1038/238413a0">10.1038/238413a0</a>.  <a
-href="biblio/may-1972.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Newman MEJ (2006) Modularity and community structure in networks.
-<strong><em>PNAS</em></strong>, doi: <a
-href="https://doi.org/10.1073/pnas.0601602103">10.1073/pnas.0601602103</a>.
+<li><p>May RM (1972) Will a large complex system be stable? <strong><em>Nature</em></strong>, doi: <a href="https://doi.org/10.1038/238413a0">10.1038/238413a0</a>.
+ <a href="biblio/may-1972.pdf"><strong>PDF</strong></a></p></li>
+<li><p>Newman MEJ (2006) Modularity and community structure in networks. <strong><em>PNAS</em></strong>, doi: <a href="https://doi.org/10.1073/pnas.0601602103">10.1073/pnas.0601602103</a>.
  <a href="biblio/newman-2006.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Podani J &amp; Schmera D (2012) A comparative evaluation of
-pairwise nestedness measures. <strong><em>Ecography</em></strong>, doi:
-<a
-href="https://doi.org/10.1111/j.1600-0587.2011.07319.x">10.1111/j.1600-0587.2011.07319.x</a>.
+<li><p>Podani J &amp; Schmera D (2012) A comparative evaluation of pairwise nestedness measures. <strong><em>Ecography</em></strong>, doi: <a href="https://doi.org/10.1111/j.1600-0587.2011.07319.x">10.1111/j.1600-0587.2011.07319.x</a>.
  <a href="biblio/podani-2012.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Strona G <em>et al.</em> (2014) A fast and unbiased procedure to
-randomize ecological binary matrices with fixed row and column totals.
-<strong><em>Nature Communications</em></strong>, doi: <a
-href="https://doi.org/10.1038/ncomms5114">10.1038/ncomms5114</a>.  <a
-href="biblio/strona-2014.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Stumpf MPH <em>et al.</em> (2012) Critical truths about power
-laws. <strong><em>Science</em></strong>, doi: <a
-href="https://doi.org/10.1126/science.1216142">10.1126/science.1216142</a>.
+<li><p>Strona G <em>et al.</em> (2014) A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. <strong><em>Nature Communications</em></strong>, doi: <a href="https://doi.org/10.1038/ncomms5114">10.1038/ncomms5114</a>.
+ <a href="biblio/strona-2014.pdf"><strong>PDF</strong></a></p></li>
+<li><p>Stumpf MPH <em>et al.</em> (2012) Critical truths about power laws. <strong><em>Science</em></strong>, doi: <a href="https://doi.org/10.1126/science.1216142">10.1126/science.1216142</a>.
  <a href="biblio/stumpf-2012.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Thomas M <em>et al.</em> (2015) Chapter 6 - A network-based
-method to detect patterns of local crop biodiversity: Validation at the
-species and infra-species levels. <strong><em>Advances in Ecological
-Research</em></strong>, doi: <a
-href="https://doi.org/10.1016/bs.aecr.2015.10.002">10.1016/bs.aecr.2015.10.002</a>.
+<li><p>Thomas M <em>et al.</em> (2015) Chapter 6 - A network-based method to detect patterns of local crop biodiversity: Validation at the species and infra-species levels. <strong><em>Advances in Ecological Research</em></strong>, doi: <a href="https://doi.org/10.1016/bs.aecr.2015.10.002">10.1016/bs.aecr.2015.10.002</a>.
  <a href="biblio/thomas-2015.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Williams RJ &amp; Martinez ND (2000) Simple rules yield complex
-food webs. <strong><em>Nature</em></strong>, doi: <a
-href="https://doi.org/10.1038/35004572">10.1038/35004572</a>.  <a
-href="biblio/williams-2000.pdf"><strong>PDF</strong></a></p></li>
-<li><p>Yang Z, Algesheimer R &amp; Tessone CJ (2016) A comparative
-analysis of community detection algorithms on artificial networks.
-<strong><em>Scientific Reports</em></strong>, doi: <a
-href="https://doi.org/10.1038/srep30750">10.1038/srep30750</a>.  <a
-href="biblio/yang-2016.pdf"><strong>PDF</strong></a></p></li>
+<li><p>Williams RJ &amp; Martinez ND (2000) Simple rules yield complex food webs. <strong><em>Nature</em></strong>, doi: <a href="https://doi.org/10.1038/35004572">10.1038/35004572</a>.
+ <a href="biblio/williams-2000.pdf"><strong>PDF</strong></a></p></li>
+<li><p>Yang Z, Algesheimer R &amp; Tessone CJ (2016) A comparative analysis of community detection algorithms on artificial networks. <strong><em>Scientific Reports</em></strong>, doi: <a href="https://doi.org/10.1038/srep30750">10.1038/srep30750</a>.
+ <a href="biblio/yang-2016.pdf"><strong>PDF</strong></a></p></li>
 </ul>
 <h2 class="appendix" id="corrections">Corrections</h2>
-<p>If you see mistakes or want to suggest changes, please <a
-href="https://github.com/theodatasci/theodatasci.github.io/issues">Create
-an issue</a> on the source repository.</p>
+<p>If you see mistakes or want to suggest changes, please
+<a href="https://github.com/theodatasci/theodatasci.github.io/issues">Create an issue</a>
+on the source repository.</p>
 <h2 class="appendix" id="reuse">Reuse</h2>
-<p>The material of this website is licensed under Creative Commons
-Attribution <a href="https://creativecommons.org/licenses/by/4.0/">CC BY
-4.0</a>. Source code is available at <a
-href="https://github.com/theodatasci/theodatasci.github.io/"
-class="uri">https://github.com/theodatasci/theodatasci.github.io/</a>.</p>
+<p>The material of this website is licensed under Creative Commons Attribution
+<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+Source code is available at <a href="https://github.com/theodatasci/theodatasci.github.io/" class="uri">https://github.com/theodatasci/theodatasci.github.io/</a>.</p>
 <h2 class="appendix" id="citation">Citation</h2>
-<p>Calcagno V, Fronhofer EA, Gounand I &amp; Massol F (2022) Workshop
-FRB-CESAB &amp; GdR TheoMoDive: Theory-driven Analysis for Ecological
-Data (Edition 2022).</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<p>Calcagno V, Fronhofer EA, Gounand I, Jacquet C, Kéfi C &amp; Massol F (2023)
+Workshop FRB-CESAB &amp; GdR TheoMoDive: Theory-driven Analysis for Ecological Data (Edition 2023).</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>

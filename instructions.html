@@ -786,6 +786,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   d-article table.gt_table td,
   d-article table.gt_table th {
     border-bottom: none;
+    font-size: 100%;
   }
 
   .html-widget {
@@ -1858,15 +1859,21 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
       // hoverable references
       $('span.citation[data-cites]').each(function() {
-        if ($(this).children()[0].nodeName == "D-FOOTNOTE") {
-          var fn = $(this).children()[0]
+        const citeChild = $(this).children()[0]
+        // Do not process if @xyz has been used without escaping and without bibliography activated
+        // https://github.com/rstudio/distill/issues/466
+        if (citeChild === undefined) return true
+
+        if (citeChild.nodeName == "D-FOOTNOTE") {
+          var fn = citeChild
           $(this).html(fn.shadowRoot.querySelector("sup"))
           $(this).id = fn.id
           fn.remove()
         }
         var refs = $(this).attr('data-cites').split(" ");
         var refHtml = refs.map(function(ref) {
-          return "<p>" + $('#ref-' + ref).html() + "</p>";
+          // Could use CSS.escape too here, we insure backward compatibility in navigator
+          return "<p>" + $('div[id="ref-' + ref + '"]').html() + "</p>";
         }).join("\n");
         window.tippy(this, {
           allowHTML: true,
@@ -2065,9 +2072,9 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </script>
 
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
-  <link href="site_libs/font-awesome-5.15.3/css/all.min.css" rel="stylesheet" />
-  <link href="site_libs/font-awesome-5.15.3/css/v4-shims.min.css" rel="stylesheet" />
+  <script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+  <link href="site_libs/font-awesome-6.2.1/css/all.min.css" rel="stylesheet" />
+  <link href="site_libs/font-awesome-6.2.1/css/v4-shims.min.css" rel="stylesheet" />
   <script src="site_libs/popper-2.6.0/popper.min.js"></script>
   <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -2105,43 +2112,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <i class="fa fa-home" aria-hidden="true"></i>
 </a>
 <a href="instructions.html">Instructions</a>
-<div class="nav-dropdown">
-<button class="nav-dropbtn">
-Courses
- 
-<span class="down-arrow">&#x25BE;</span>
-</button>
-<div class="nav-dropdown-content">
-<span class="nav-dropdown-header">DAY 1</span>
-<a href="courses/theo-modeling/Day1_TAED.pdf">Isabelle Gounand talk</a>
-<a href="https://www.ecotheory.ca/theorydata/datatheory.html">Kim Cuddington talk</a>
-<a href="https://www.dropbox.com/s/6kjbkylojgi6ke8/Cuddington160522_theorydata.mp4?dl=0">Kim Cuddington video</a>
-<span class="nav-dropdown-header">DAY 2</span>
-<a href="courses/time-series/emmanuel/fronhofer_day2_cesab_theomodive.pdf">Emmanuel Fronhofer talk</a>
-<a href="courses/time-series/camille/Time_series.html">Camille Saade talk</a>
-<a href="courses/time-series/benjamin/time_series_data_talk.pdf">Benjamin Rosenbaum talk</a>
-<a href="https://raw.githubusercontent.com/fbarraquand/overcompensating-popdyn-models/main/popdyn-vole-models.pdf">Frédéric Barraquand talk</a>
-<span class="nav-dropdown-header">DAY 3</span>
-<a href="courses/spatial-data/TDAED_slides.pdf">Vincent Calcagno talk</a>
-<a href="https://github.com/mxdub/TMDSpatial_data">Maxime Dubart GitHub</a>
-<a href="courses/spatial-data/2022_05_18_CESAB.pdf">Virginie Ravigné talk</a>
-<span class="nav-dropdown-header">DAY 4</span>
-<a href="courses/networks/Day4_Networks.pdf">François Massol talk</a>
-<a href="courses/networks/matthieu/MB_cesab.pdf">Matthieu Barbier talk</a>
-<a href="courses/networks/Claire/empirical_food_webs.pdf">Claire Jacquet talk</a>
-<a href="courses/networks/2022_05_cesab_Kefi.pdf">Sonia Kéfi talk</a>
-</div>
-</div>
-<div class="nav-dropdown">
-<button class="nav-dropbtn">
-Exercises
- 
-<span class="down-arrow">&#x25BE;</span>
-</button>
-<div class="nav-dropdown-content">
-<a href="courses/time-series/benjamin/time_series_data_R.pdf">Confronting population models with time series data</a>
-</div>
-</div>
+<a href="#">Courses</a>
+<a href="#">Exercises</a>
 <a href="resources.html">Resources</a>
 <a href="https://github.com/theodatasci/theodatasci.github.io/">
 <i class="fab fa-github" aria-hidden="true"></i>
@@ -2169,17 +2141,11 @@ Exercises
 <ul>
 <li><a href="#installation" id="toc-installation">Installation</a>
 <ul>
-<li><a href="#windows"
-id="toc-windows"><i class="fab fa-windows" role="presentation" aria-label="windows icon"></i>
- Windows</a></li>
-<li><a href="#macos"
-id="toc-macos"><i class="fab fa-apple" role="presentation" aria-label="apple icon"></i>
- macOS</a></li>
-<li><a href="#ubuntu"
-id="toc-ubuntu"><i class="fab fa-ubuntu" role="presentation" aria-label="ubuntu icon"></i> Ubuntu</a></li>
+<li><a href="#windows" id="toc-windows"><i class="fab fa-windows" role="presentation" aria-label="windows icon"></i>  Windows</a></li>
+<li><a href="#macos" id="toc-macos"><i class="fab fa-apple" role="presentation" aria-label="apple icon"></i>  macOS</a></li>
+<li><a href="#ubuntu" id="toc-ubuntu"><i class="fab fa-ubuntu" role="presentation" aria-label="ubuntu icon"></i> Ubuntu</a></li>
 </ul></li>
-<li><a href="#for-the-workshop" id="toc-for-the-workshop">For the
-workshop</a></li>
+<li><a href="#for-the-workshop" id="toc-for-the-workshop">For the workshop</a></li>
 <li><a href="#corrections" id="toc-corrections">Corrections</a></li>
 <li><a href="#reuse" id="toc-reuse">Reuse</a></li>
 <li><a href="#citation" id="toc-citation">Citation</a></li>
@@ -2187,92 +2153,74 @@ workshop</a></li>
 </nav>
 </div>
 <p><br/></p>
-<p><i class="fa fa-hand-point-right" role="presentation" aria-label="hand-point-right icon"></i> 
-<strong>Please install the latest versions of
-<i class="fab fa-r-project" role="presentation" aria-label="r-project icon"></i>
+<p><i class="far fa-hand-point-right" role="presentation" aria-label="hand-point-right icon"></i> 
+<strong>Please install the latest versions of <i class="fab fa-r-project" role="presentation" aria-label="r-project icon"></i>
 and RStudio.</strong></p>
 <p><br/></p>
 <h2 id="installation">Installation</h2>
-<h3
-id="windows"><i class="fab fa-windows" role="presentation" aria-label="windows icon"></i>
- Windows</h3>
+<h3 id="windows"><i class="fab fa-windows" role="presentation" aria-label="windows icon"></i>  Windows</h3>
 <ol type="1">
-<li>Download
-<i class="fab fa-r-project" role="presentation" aria-label="r-project icon"></i>
-at:<br/> <a
-href="https://cran.r-project.org/">https://cran.r-project.org/</a></li>
+<li>Download <i class="fab fa-r-project" role="presentation" aria-label="r-project icon"></i> at:<br/>
+<a href="https://cran.r-project.org/">https://cran.r-project.org/</a></li>
 </ol>
-<p>      <i class="fa fa-caret-right" role="presentation" aria-label="caret-right icon"></i>
-  Click on <em>Download R for Windows</em>
-<br/>      <i class="fa fa-caret-right" role="presentation" aria-label="caret-right icon"></i>
-  Click on <em>base</em>
-<br/>      <i class="fa fa-caret-right" role="presentation" aria-label="caret-right icon"></i>
-  Click on <em>Download R 4.2.0 for Windows</em>
-<br/>      <i class="fa fa-caret-right" role="presentation" aria-label="caret-right icon"></i>
-  Open <em>R-4.2.0-win.exe</em> and follow instructions</p>
+<p>      <i class="fas fa-caret-right" role="presentation" aria-label="caret-right icon"></i>  
+Click on <em>Download R for Windows</em>
+<br/>      <i class="fas fa-caret-right" role="presentation" aria-label="caret-right icon"></i>  
+Click on <em>base</em>
+<br/>      <i class="fas fa-caret-right" role="presentation" aria-label="caret-right icon"></i>  
+Click on <em>Download R 4.2.3 for Windows</em>
+<br/>      <i class="fas fa-caret-right" role="presentation" aria-label="caret-right icon"></i>  
+Open <em>R-4.2.3-win.exe</em> and follow instructions</p>
 <p><br/></p>
 <ol start="2" type="1">
-<li>Download <strong><code>RStudio Desktop</code></strong> at:<br/> <a
-href="https://www.rstudio.com/products/rstudio/download/#download">https://www.rstudio.com/products/rstudio/download/#download</a></li>
+<li>Download <strong><code>RStudio Desktop</code></strong> at:<br/>
+<a href="https://posit.co/download/rstudio-desktop/">https://posit.co/download/rstudio-desktop/</a></li>
 </ol>
-<p>      <i class="fa fa-caret-right" role="presentation" aria-label="caret-right icon"></i>
-  Download the version for Windows 10/11 (the <strong>.exe</strong> and
-not the <strong>.zip</strong>)
-<br/>      <i class="fa fa-caret-right" role="presentation" aria-label="caret-right icon"></i>
-  Open <em>RStudio-2022.02.2-485.exe</em> and follow instructions
-<br/>      <i class="fa fa-caret-right" role="presentation" aria-label="caret-right icon"></i>
-  Check if <strong><code>RStudio</code></strong> has found
-<i class="fab fa-r-project" role="presentation" aria-label="r-project icon"></i>.
+<p>      <i class="fas fa-caret-right" role="presentation" aria-label="caret-right icon"></i>  
+Download the version for Windows 10/11 (the <strong>.exe</strong> and not the <strong>.zip</strong>)
+<br/>      <i class="fas fa-caret-right" role="presentation" aria-label="caret-right icon"></i>  
+Open <em>RStudio-2023.03.0-386.exe</em> and follow instructions
+<br/>      <i class="fas fa-caret-right" role="presentation" aria-label="caret-right icon"></i>  
+Check if <strong><code>RStudio</code></strong> has found <i class="fab fa-r-project" role="presentation" aria-label="r-project icon"></i>.
 Launch <strong><code>RStudio</code></strong> and run:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>R.version.string</span>
-<span class='co'>## [1] "R version 4.2.0 (2022-04-22) -- "Vigorous Calisthenics"</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>R.version.string</span></span>
+<span><span class='co'>## [1] "R version 4.2.3 (2023-03-15) -- "Shortstop Beagle"</span></span></code></pre>
 </div>
 </div>
 <p><br/></p>
 <ol start="3" type="1">
-<li>Download <strong><code>Rtools4.2</code></strong> at:<br/> <a
-href="https://cran.r-project.org/bin/windows/Rtools/rtools42/rtools.html">https://cran.r-project.org/bin/windows/Rtools/rtools42/rtools.html</a></li>
+<li>Download <strong><code>Rtools4.2</code></strong> at:<br/>
+<a href="https://cran.r-project.org/bin/windows/Rtools/rtools42/rtools.html">https://cran.r-project.org/bin/windows/Rtools/rtools42/rtools.html</a></li>
 </ol>
-<p>      <i class="fa fa-caret-right" role="presentation" aria-label="caret-right icon"></i>
-  Download the 64-bit version for Windows
-<br/>      <i class="fa fa-caret-right" role="presentation" aria-label="caret-right icon"></i>
-  Open <em>rtools42-5253-5107.exe</em> and follow instructions</p>
-<p>The installation of <strong><code>Rtools4.2</code></strong> is
-strongly recommended to install some packages from sources.
-<strong><code>Rtools4.2</code></strong> contains in particular the
-utility <code>make</code>.</p>
-<p>Restart <strong><code>RStudio</code></strong> and check that
-<i class="fab fa-r-project" role="presentation" aria-label="r-project icon"></i>
-finds the utility <code>make</code>:</p>
+<p>      <i class="fas fa-caret-right" role="presentation" aria-label="caret-right icon"></i>  
+Download the 64-bit version for Windows
+<br/>      <i class="fas fa-caret-right" role="presentation" aria-label="caret-right icon"></i>  
+Open <em>rtools42-5355-5357.exe</em> and follow instructions</p>
+<p>The installation of <strong><code>Rtools4.2</code></strong> is strongly recommended to install some packages
+from sources.
+<strong><code>Rtools4.2</code></strong> contains in particular the utility <code>make</code>.</p>
+<p>Restart <strong><code>RStudio</code></strong> and check that <i class="fab fa-r-project" role="presentation" aria-label="r-project icon"></i> finds the utility <code>make</code>:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span><span class='op'>(</span><span class='st'>"make"</span><span class='op'>)</span>
-<span class='co'>## "C:\\rtools42\\usr\\bin\\make.exe"</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span><span class='op'>(</span><span class='st'>"make"</span><span class='op'>)</span></span>
+<span><span class='co'>## "C:\\rtools42\\usr\\bin\\make.exe"</span></span></code></pre>
 </div>
 </div>
 <p>Now you can install packages from sources:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></span><span class='op'>(</span><span class='st'>"jsonlite"</span>, type <span class='op'>=</span> <span class='st'>"source"</span><span class='op'>)</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='fu'><a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></span><span class='op'>(</span><span class='st'>"jsonlite"</span>, type <span class='op'>=</span> <span class='st'>"source"</span><span class='op'>)</span></span></code></pre>
 </div>
 </div>
 <p><br/></p>
-<h3
-id="macos"><i class="fab fa-apple" role="presentation" aria-label="apple icon"></i>
- macOS</h3>
-<p>Th easiest way to set up your environment is by using the package
-manager for macOS <a
-href="https://brew.sh"><strong><code>Homebrew</code></strong></a>. With
-this tool you can install (and update) your software directly from the
-terminal. First you need to install the Apple software <em>Command Line
-Tools for Xcode</em>.</p>
-<p>Open a <a
-href="https://support.apple.com/en-gb/guide/terminal/apd5265185d-f365-44cb-8b09-71a064a42125/mac">terminal</a>,
+<h3 id="macos"><i class="fab fa-apple" role="presentation" aria-label="apple icon"></i>  macOS</h3>
+<p>Th easiest way to set up your environment is by using the package manager for macOS
+<a href="https://brew.sh"><strong><code>Homebrew</code></strong></a>. With this tool you can install (and update) your
+software directly from the terminal. First you need to install the Apple software
+<em>Command Line Tools for Xcode</em>.</p>
+<p>Open a <a href="https://support.apple.com/en-gb/guide/terminal/apd5265185d-f365-44cb-8b09-71a064a42125/mac">terminal</a>,
 run this line and accept the license:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Install Xcode Command Line Tools ----</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> xcode-select <span class="at">--install</span></span></code></pre></div>
@@ -2282,7 +2230,7 @@ run this line and accept the license:</p>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Check installation ----</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> <span class="at">--version</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">## Homebrew 3.4.10</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">## Homebrew 4.0.9</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">## Update repositories (list of available software) ----</span></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> update</span></code></pre></div>
@@ -2296,17 +2244,15 @@ run this line and accept the license:</p>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">## Install RStudio Desktop ----</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install <span class="at">--cask</span> rstudio</span></code></pre></div>
-<p>Open <strong><code>RStudio</code></strong> and check your
-installation:</p>
+<p>Open <strong><code>RStudio</code></strong> and check your installation:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>R.version.string</span>
-<span class='co'>## "R version 4.2.0 (2022-04-22) -- "Vigorous Calisthenics"</span>
-
-<span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span><span class='op'>(</span><span class='st'>"make"</span><span class='op'>)</span>
-<span class='co'>##            make </span>
-<span class='co'>## "/usr/bin/make"</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>R.version.string</span></span>
+<span><span class='co'>## "R version 4.2.3 (2023-03-15) -- "Shortstop Beagle"</span></span>
+<span></span>
+<span><span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span><span class='op'>(</span><span class='st'>"make"</span><span class='op'>)</span></span>
+<span><span class='co'>##            make </span></span>
+<span><span class='co'>## "/usr/bin/make"</span></span></code></pre>
 </div>
 </div>
 <p><br/></p>
@@ -2314,16 +2260,14 @@ installation:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Update environment ----</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> update <span class="kw">&amp;&amp;</span> <span class="ex">brew</span> upgrade <span class="at">--greedy</span></span></code></pre></div>
 <p><br/></p>
-<h3
-id="ubuntu"><i class="fab fa-ubuntu" role="presentation" aria-label="ubuntu icon"></i> Ubuntu</h3>
+<h3 id="ubuntu"><i class="fab fa-ubuntu" role="presentation" aria-label="ubuntu icon"></i> Ubuntu</h3>
 <p>First check your version of Ubuntu in a terminal:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Check Ubuntu version ----</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /etc/issue</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">## Ubuntu 22.04 LTS</span></span></code></pre></div>
 <p><br/></p>
 <table>
-<caption>Table 1. List of CRAN repositories for different versions of
-Ubuntu</caption>
+<caption>Table 1. List of CRAN repositories for different versions of Ubuntu</caption>
 <colgroup>
 <col style="width: 12%" />
 <col style="width: 18%" />
@@ -2340,58 +2284,38 @@ Ubuntu</caption>
 <tr class="odd">
 <td style="text-align: center;">22.04 LTS</td>
 <td style="text-align: left;">Jammy Jellyfish</td>
-<td style="text-align: left;"><a
-href="https://cloud.r-project.org/bin/linux/ubuntu"
-class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a>
-jammy-cran40/</td>
+<td style="text-align: left;"><a href="https://cloud.r-project.org/bin/linux/ubuntu" class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a> jammy-cran40/</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">21.10</td>
 <td style="text-align: left;">Impish Indri</td>
-<td style="text-align: left;"><a
-href="https://cloud.r-project.org/bin/linux/ubuntu"
-class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a>
-impish-cran40/</td>
+<td style="text-align: left;"><a href="https://cloud.r-project.org/bin/linux/ubuntu" class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a> impish-cran40/</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">21.04</td>
 <td style="text-align: left;">Hirsute Hippo</td>
-<td style="text-align: left;"><a
-href="https://cloud.r-project.org/bin/linux/ubuntu"
-class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a>
-hirsute-cran40/</td>
+<td style="text-align: left;"><a href="https://cloud.r-project.org/bin/linux/ubuntu" class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a> hirsute-cran40/</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">20.04 LTS</td>
 <td style="text-align: left;">Focal Fossa</td>
-<td style="text-align: left;"><a
-href="https://cloud.r-project.org/bin/linux/ubuntu"
-class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a>
-focal-cran40/</td>
+<td style="text-align: left;"><a href="https://cloud.r-project.org/bin/linux/ubuntu" class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a> focal-cran40/</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">18.04 LTS</td>
 <td style="text-align: left;">Bionic Beaver</td>
-<td style="text-align: left;"><a
-href="https://cloud.r-project.org/bin/linux/ubuntu"
-class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a>
-bionic-cran40/</td>
+<td style="text-align: left;"><a href="https://cloud.r-project.org/bin/linux/ubuntu" class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a> bionic-cran40/</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">16.04 LTS</td>
 <td style="text-align: left;">Xenial Xerus</td>
-<td style="text-align: left;"><a
-href="https://cloud.r-project.org/bin/linux/ubuntu"
-class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a>
-xenial-cran40/</td>
+<td style="text-align: left;"><a href="https://cloud.r-project.org/bin/linux/ubuntu" class="uri">https://cloud.r-project.org/bin/linux/ubuntu</a> xenial-cran40/</td>
 </tr>
 </tbody>
 </table>
 <p><br/></p>
-<p>Install
-<i class="fab fa-r-project" role="presentation" aria-label="r-project icon"></i>
-by following these steps (change the URL below by the one specific to
-your version of Ubuntu, cf. Table 1) :</p>
+<p>Install <i class="fab fa-r-project" role="presentation" aria-label="r-project icon"></i> by following these steps
+(change the URL below by the one specific to your version of Ubuntu, cf. Table 1) :</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Install APT utilities ----</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install wget software-properties-common</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2411,44 +2335,37 @@ your version of Ubuntu, cf. Table 1) :</p>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install build-essential</span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install r-base-dev</span></code></pre></div>
 <p><br/></p>
-<p>To install <strong><code>RStudio Desktop</code></strong> visit this
-page: <a
-href="https://www.rstudio.com/products/rstudio/download/#download"
-class="uri">https://www.rstudio.com/products/rstudio/download/#download</a>,
-download the <code>.deb</code> file for Ubuntu 18+/Debian 10+ and
-install it. If you have an older version of Ubuntu (16.04), visit this
-page: <a href="https://www.rstudio.com/products/rstudio/older-versions/"
-class="uri">https://www.rstudio.com/products/rstudio/older-versions/</a></p>
-<p>Alternatively, you can install
-<strong><code>RStudio Desktop</code></strong> from the terminal:</p>
+<p>To install <strong><code>RStudio Desktop</code></strong> visit this page:
+<a href="https://posit.co/download/rstudio-desktop/" class="uri">https://posit.co/download/rstudio-desktop/</a>, download the
+<code>.deb</code> file for Ubuntu 22 (Ubuntu 18+/Debian 10+ depending on your version)
+and install it.</p>
+<p>Alternatively, you can install <strong><code>RStudio Desktop</code></strong> from the terminal:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Install wget utility ----</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install wget</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Download RStudio Desktop installer (Ubuntu &gt;= 18.04) ----</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://download1.rstudio.org/desktop/bionic/amd64/rstudio-2022.02.2-485-amd64.deb</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Download RStudio Desktop installer (Ubuntu = 22.04) ----</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://download1.rstudio.org/electron/jammy/amd64/rstudio-2023.03.0-386-amd64.deb</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">## Download RStudio Desktop installer (Ubuntu 16.04 only) ----</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># wget https://download1.rstudio.org/desktop/xenial/amd64/rstudio-1.4.1106-amd64.deb</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">## Download RStudio Desktop installer (Ubuntu &lt; 22.04) ----</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># wget https://download1.rstudio.org/electron/jammy/amd64/rstudio-2023.03.0-386-amd64.deb</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">## Install RStudio Desktop ----</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dpkg <span class="at">-i</span> rstudio-2022.02.2-485-amd64.deb</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># sudo dpkg -i rstudio-1.4.1106-amd64.deb</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dpkg <span class="at">-i</span> rstudio-2023.03.0-386-amd64.deb</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># sudo dpkg -i rstudio-2023.03.0-386-amd64.deb</span></span>
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">## Remove installer ----</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> rstudio-2022.02.2-485-amd64.deb</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># rm rstudio-1.4.1106-amd64.deb</span></span></code></pre></div>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> rstudio-2023.03.0-386-amd64.deb</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># rm rstudio-2023.03.0-386-amd64.deb</span></span></code></pre></div>
 <p><br/></p>
-<p>Open <strong><code>RStudio</code></strong> and check your
-installation:</p>
+<p>Open <strong><code>RStudio</code></strong> and check your installation:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>R.version.string</span>
-<span class='co'>## "R version 4.2.0 (2022-04-22) -- "Vigorous Calisthenics"</span>
-
-<span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span><span class='op'>(</span><span class='st'>"make"</span><span class='op'>)</span>
-<span class='co'>##            make </span>
-<span class='co'>## "/usr/bin/make"</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>R.version.string</span></span>
+<span><span class='co'>## 4.2.3 (2023-03-15) -- "Shortstop Beagle"</span></span>
+<span></span>
+<span><span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span><span class='op'>(</span><span class='st'>"make"</span><span class='op'>)</span></span>
+<span><span class='co'>##            make </span></span>
+<span><span class='co'>## "/usr/bin/make"</span></span></code></pre>
 </div>
 </div>
 <p><br/></p>
@@ -2457,37 +2374,29 @@ installation:</p>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> apt upgrade <span class="at">-y</span></span></code></pre></div>
 <p><br/></p>
 <h2 id="for-the-workshop">For the workshop</h2>
-<p>You will need to install the <a
-href="https://mc-stan.org/users/interfaces/rstan"><code>rstan</code></a>
-package:</p>
+<p>You will need to install the <a href="https://mc-stan.org/users/interfaces/rstan"><code>rstan</code></a> package:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>## CRAN package ----</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></span><span class='op'>(</span><span class='st'>"rstan"</span><span class='op'>)</span>
-
-<span class='co'>## Check the installation ----</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='va'>stan_model</span>, package <span class='op'>=</span> <span class='st'>"rstan"</span>, run.dontrun <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='co'>## CRAN package ----</span></span>
+<span><span class='fu'><a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></span><span class='op'>(</span><span class='st'>"rstan"</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='co'>## Check the installation ----</span></span>
+<span><span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='va'>stan_model</span>, package <span class='op'>=</span> <span class='st'>"rstan"</span>, run.dontrun <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span></code></pre>
 </div>
 </div>
-<p>If the example model fails, please read this <a
-href="https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started#verifying-installation">page</a>.</p>
+<p>If the example model fails, please read this <a href="https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started#verifying-installation">page</a>.</p>
 <h2 class="appendix" id="corrections">Corrections</h2>
-<p>If you see mistakes or want to suggest changes, please <a
-href="https://github.com/theodatasci/theodatasci.github.io/issues">Create
-an issue</a> on the source repository.</p>
+<p>If you see mistakes or want to suggest changes, please
+<a href="https://github.com/theodatasci/theodatasci.github.io/issues">Create an issue</a>
+on the source repository.</p>
 <h2 class="appendix" id="reuse">Reuse</h2>
-<p>The material of this website is licensed under Creative Commons
-Attribution <a href="https://creativecommons.org/licenses/by/4.0/">CC BY
-4.0</a>. Source code is available at <a
-href="https://github.com/theodatasci/theodatasci.github.io/"
-class="uri">https://github.com/theodatasci/theodatasci.github.io/</a>.</p>
+<p>The material of this website is licensed under Creative Commons Attribution
+<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+Source code is available at <a href="https://github.com/theodatasci/theodatasci.github.io/" class="uri">https://github.com/theodatasci/theodatasci.github.io/</a>.</p>
 <h2 class="appendix" id="citation">Citation</h2>
-<p>Calcagno V, Fronhofer EA, Gounand I &amp; Massol F (2022) Workshop
-FRB-CESAB &amp; GdR TheoMoDive: Theory-driven Analysis for Ecological
-Data (Edition 2022).</p>
-<div class="sourceCode" id="cb9"><pre
-class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<p>Calcagno V, Fronhofer EA, Gounand I, Jacquet C, Kéfi C &amp; Massol F (2023)
+Workshop FRB-CESAB &amp; GdR TheoMoDive: Theory-driven Analysis for Ecological Data (Edition 2023).</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
