@@ -1,6 +1,6 @@
 ## Workshop website
 
-![](https://raw.githubusercontent.com/theodatasci/theodatasci.github.io/main/img/banner-theodatasci_150dpi.png)
+![](https://raw.githubusercontent.com/theodatasci/.github/main/profile/banner-theodatasci_150dpi.png)
 
 Website of the workshop **_Theory-driven Analysis for Ecological Data_**
 co-organized by the 

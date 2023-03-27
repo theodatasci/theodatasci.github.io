@@ -42,7 +42,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 
-![](img/banner-theodatasci_150dpi.png)
+![](https://raw.githubusercontent.com/theodatasci/.github/main/profile/banner-theodatasci_150dpi.png)
 
 
 
