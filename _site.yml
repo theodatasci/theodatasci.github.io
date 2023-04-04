@@ -45,7 +45,7 @@ navbar:
       # - text: "François Massol talk"
       #   href: "courses/networks/Day4_Networks.pdf"
       # - text: "Matthieu Barbier talk"
-      #   href: "courses/networks/matthieu/MB_cesab.pdf"
+        href: "courses/networks/matthieu/MB_cesab.pdf"
       # - text: "Claire Jacquet talk"
       #   href: "courses/networks/Claire/empirical_food_webs.pdf"
       # - text: "Sonia Kéfi talk"
