@@ -19,8 +19,10 @@ navbar:
       href: "#"
       menu:
       - text: "DAY 1"
-      # - text: "Isabelle Gounand talk"
-      #   href: "courses/theo-modeling/Day1_TAED.pdf"
+      - text: "Isabelle Gounand talk"
+        href: "courses/theo-modeling/TAED_2023_ModelPanorama.pdf"
+      - text: "Claire Jacquet talk"
+        href: "courses/theo-modeling/course_Day1_linking_theory_data.pdf"
       - text: "Kim Cuddington talk"
         href: "https://www.ecotheory.ca/theorydata/datatheory.html"
       # - text: "Kim Cuddington video"
