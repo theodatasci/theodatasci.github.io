@@ -1,7 +1,7 @@
 name: "theodatasci"
-title: "Theory-driven Analysis for Ecological Data Workshop"
+title: "Theory-driven analysis for ecological data training course"
 description: |
-  Theory-driven Analysis for Ecological Data Workshop
+  Theory-driven analysis for ecological data training course
 base_url: https://theodatasci.github.io
 favicon: img/favicon.png
 output_dir: "."
@@ -48,11 +48,6 @@ navbar:
         href: "courses/networks/Claire/empirical_food_webs_2023.pdf"
       - text: "Sonia Kéfi talk"
         href: "courses/networks/2022_05_cesab_Kefi.pdf"
-    # - text: "Exercises"
-    #   href: "#"
-      # menu:
-      # - text: "Confronting population models with time series data"
-      #   href: "courses/time-series/benjamin/time_series_data_R.pdf"
     - text: "Resources"
       href: resources.html
     - icon: fab fa-github

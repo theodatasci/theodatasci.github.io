@@ -1,6 +1,6 @@
 ---
-title: "Theory-driven Analysis for Ecological Data"
-description: "FRB-CESAB & GdR TheoMoDive Workshop"
+title: "Theory-driven analysis for ecological data"
+description: "FRB-CESAB & GdR TheoMoDive training course"
 author:
   - name: "Vincent Calcagno"
     url: https://vcalcagnoresearch.wordpress.com/
@@ -56,7 +56,7 @@ and the
 is to train young researchers in theory-based approaches to model ecological data 
 (e.g. temporal series, macroecology, interaction and trophic network, etc.).
 
-The second edition of this training course will take place from the 3rd to the 
+The second edition of this training course took place from the 3rd to the 
 7th of April 2023 in the CESAB premises in Montpellier.
 
 
@@ -68,13 +68,13 @@ The second edition of this training course will take place from the 3rd to the
 
 General schedule: 
 
-`08:30-10:45` - Courses<br/>
-`10:45-11:00` - _Coffee break_<br/>
-`11:00-12:30` - Courses<br/>
+`09:00-10:30` - Courses<br/>
+`10:30-10:45` - _Coffee break_<br/>
+`10:45-12:30` - Courses<br/>
 `12h30-14:00` - _Lunch_<br/>
-`14:00-15:45` - Practices<br/>
-`15:45-16:00` - _Coffee break_<br/>
-`16:00-17:30` - Practices<br/>
+`14:00-15:30` - Practices<br/>
+`15:30-15:45` - _Coffee break_<br/>
+`15:45-17:30` - Practices<br/>
 `17:30-18:00` - _Break_<br/>
 `18:00-19:00` - Guest speaker
 
