@@ -65,29 +65,3 @@ knitr::opts_chunk$set(echo = FALSE)
 &nbsp;[**PDF**](biblio/yang-2016.pdf)
 
 
-
-
-## Corrections {.appendix}
-
-
-If you see mistakes or want to suggest changes, please 
-[Create an issue](https://github.com/theodatasci/theodatasci.github.io/issues)
-on the source repository.
-
-
-
-## Reuse {.appendix}
-
-
-The material of this website is licensed under Creative Commons Attribution 
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-Source code is available at https://github.com/theodatasci/theodatasci.github.io/.
-
-
-
-## Citation {.appendix}
-
-
-
-Calcagno V, Fronhofer EA, Gounand I, Jacquet C, Kéfi C & Massol F (2023) 
-Workshop FRB-CESAB & GdR TheoMoDive: Theory-driven Analysis for Ecological Data (Edition 2023). 

@@ -91,6 +91,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <title>Theory-driven analysis for ecological data training course: Resources</title>
 
 
+  <link rel="license" href="https://creativecommons.org/licenses/by/4.0/"/>
   <link rel="icon" type="image/png" href="img/favicon.png"/>
 
 
@@ -2082,8 +2083,68 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
   <script src="site_libs/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
+  <style type="text/css">
+  div.box-info p {
+    padding: 1em;
+    margin: 20px 0;
+    background: #DDECF6;
+    border: 1px solid #CEE9F2;
+    border-radius: 10px;
+    color: #487997;
+    border-left: 5px solid #487997;
+  }
+
+  div.box-header p {
+    padding: 1em;
+    margin: 20px 0;
+    margin-top: 0;
+    background: #D5E6DE;
+    border: 1px solid #C0DACD;
+    border-radius: 10px;
+    color: #567763;
+    border-left: 5px solid #567763;
+  }
+
+  .d-title {
+    text-align: center;
+  }
+  /*
+  .distill-site-nav {
+    background-color: #67516e;
+  }
+  */
+
+
+  .btn {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 85%;
+    font-weight: normal;
+    font-family: Monospace;
+    margin-left: 10px;
+    color: black;
+    border: 1px solid #ddecf6;
+    background-color: #ddecf6;
+    border-radius: 8px;
+    padding: 4px 8px 4px 8px;
+
+  }
+
+  .btn a:link, .btn a:hover, .btn a:focus, .btn a:visited {
+    text-decoration: none;
+    border: 0px;
+  }
+
+  .btn:hover, .btn:focus {
+    color: white;
+    border: 1px solid #487997;
+    background-color: #487997;
+  }
+
+  </style>
   <!--/radix_placeholder_site_in_header-->
 
+  <link rel="stylesheet" href="css/theme.css" type="text/css"/>
 
 </head>
 
@@ -2109,7 +2170,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <a href="index.html">
 <i class="fa fa-home" aria-hidden="true"></i>
 </a>
-<a href="instructions.html">Instructions</a>
+<a href="https://frbcesab.github.io/training-courses/installation.html">Instructions</a>
 <div class="nav-dropdown">
 <button class="nav-dropbtn">
 Courses
@@ -2137,7 +2198,7 @@ Courses
 </div>
 </div>
 <a href="resources.html">Resources</a>
-<a href="https://github.com/theodatasci/theodatasci.github.io/">
+<a href="https://github.com/theodatasci/theodatasci.github.io" aria-label="Link to source">
 <i class="fab fa-github" aria-hidden="true"></i>
 </a>
 <a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
@@ -2193,17 +2254,6 @@ Courses
 <li><p>Yang Z, Algesheimer R &amp; Tessone CJ (2016) A comparative analysis of community detection algorithms on artificial networks. <strong><em>Scientific Reports</em></strong>, doi: <a href="https://doi.org/10.1038/srep30750">10.1038/srep30750</a>.
  <a href="biblio/yang-2016.pdf"><strong>PDF</strong></a></p></li>
 </ul>
-<h2 class="appendix" id="corrections">Corrections</h2>
-<p>If you see mistakes or want to suggest changes, please
-<a href="https://github.com/theodatasci/theodatasci.github.io/issues">Create an issue</a>
-on the source repository.</p>
-<h2 class="appendix" id="reuse">Reuse</h2>
-<p>The material of this website is licensed under Creative Commons Attribution
-<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
-Source code is available at <a href="https://github.com/theodatasci/theodatasci.github.io/" class="uri">https://github.com/theodatasci/theodatasci.github.io/</a>.</p>
-<h2 class="appendix" id="citation">Citation</h2>
-<p>Calcagno V, Fronhofer EA, Gounand I, Jacquet C, Kéfi C &amp; Massol F (2023)
-Workshop FRB-CESAB &amp; GdR TheoMoDive: Theory-driven Analysis for Ecological Data (Edition 2023).</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
@@ -2216,7 +2266,12 @@ Workshop FRB-CESAB &amp; GdR TheoMoDive: Theory-driven Analysis for Ecological D
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->
 <!--radix_placeholder_appendices-->
-<div class="appendix-bottom"></div>
+<div class="appendix-bottom">
+<h3 id="updates-and-corrections">Corrections</h3>
+<p>If you see mistakes or want to suggest changes, please <a href="https://github.com/theodatasci/theodatasci.github.io/issues/new">create an issue</a> on the source repository.</p>
+<h3 id="reuse">Reuse</h3>
+<p>Text and figures are licensed under Creative Commons Attribution <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Source code is available at <a href="https://github.com/theodatasci/theodatasci.github.io">https://github.com/theodatasci/theodatasci.github.io</a>, unless otherwise noted. The figures that have been reused from other sources don't fall under this license and can be recognized by a note in their caption: "Figure from ...".</p>
+</div>
 <!--/radix_placeholder_appendices-->
 <!--radix_placeholder_navigation_after_body-->
 <!--/radix_placeholder_navigation_after_body-->
