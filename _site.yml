@@ -15,8 +15,6 @@ navbar:
   right:
     - icon: fa fa-home
       href: index.html
-    - text: "Instructions"
-      href: https://frbcesab.github.io/training-courses/installation.html
     - text: "Courses"
       href: "#"
       menu:

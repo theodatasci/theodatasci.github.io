@@ -144,7 +144,7 @@ is to train young researchers in theory-based approaches to model ecological dat
 
 ## Prerequisites
 
-Please follow this [tutorial](https://frbcesab.github.io/training-courses/installation.html) to install your working environment **before** attending the training course.
+If you want ready-to-use working environment for R, follow this [tutorial](https://frbcesab.github.io/rsetup). For this course, you don't need to install `git` and `Docker`.
 
 
 <br/>
@@ -162,5 +162,5 @@ Discover the other training courses provided by the FRB-CESAB and its partners: 
 
 
 
-Casajus N, Calcagno V, Fronhofer EA, Gounand I, Jacquet C, Kéfi C & Massol F (2023) 
+Casajus N, Calcagno V, Fronhofer EA, Gounand I, Jacquet C, Kéfi C & Massol F (2024) 
 FRB-CESAB & GdR TheoMoDive training course: Theory-driven analysis for ecological data. 
