@@ -13,13 +13,13 @@ knitr::opts_chunk$set(echo = FALSE)
 <br/>
 
 
-**Recommended papers - models**
+**Recommended papers [day 1: models]**
 
 - Franck C, Dunne JA, Le Maho Y, May RM, Thébaud C, Hochberg ME (2015) Fundamental ecology is fundamental. **_Trends in Ecology & Evolution_**, 30(1):9-16 (https://doi.org/10.1016/j.tree.2014.11.005)
 
 - Grainger TN, Senthilnathan A, Ke P-J, Barbour MA, Jones NT, DeLong JP, Otto SP, O’Connor MI, Coblentz KE, Goel N, Sakarchi J, Szojka MC, Levine JM & Germain RM (2022) An Empiricist’s Guide to Using Ecological Theory. **_The American Naturalist_**, 199(1): 1-20 (https://doi.org/10.1086/717206)
 
-**Recommended papers - time**
+**Recommended papers [day 2: time]**
 
 - Fronhofer EA, Govaert L, O'Connor MI, Schreiber, SJ. & Altermatt F (2024) The shape of density dependence and the relationship between population growth, intraspecific competition and equilibrium population density. **_Oikos_**, 2024(2): e09824 (10.1111/oik.09824)
 
@@ -29,7 +29,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 - Mallet J (2012) The struggle for existence: how the notion of carrying capacity, K, obscures the links between demography, Darwinian evolution, and speciation. **_Evol. Ecol. Res._**, 14(5):627-665
 
-**Recommended papers - networks**
+**Recommended papers [day 4: networks]**
 
 - Bascompte J (2009) Disentangling the Web of Life. **_Science_**, 325,416-419, (https://www.science.org/doi/10.1126/science.1170749)
 
