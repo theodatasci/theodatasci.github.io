@@ -82,54 +82,54 @@ is to train young researchers in theory-based approaches to model ecological dat
 
 <table>
   
-  <tr>
+  <tr style="background-color:#f0f2ed">
     <td rowspan="4">**Monday**</td>
-    <td>**_Speakers_**: Isabelle Gounand, Sonia Kéfi & Claire Jacquet</td>
+    <td>**_Speakers_**: Isabelle Gounand, Sonia Kéfi & Vincent Calcagno </td>
   </tr>
-  <tr>
+  <tr style="background-color:#f0f2ed">
     <td>Icebreaker & Introduction to the week</td>
   </tr>
-  <tr>
+  <tr style="background-color:#f0f2ed">
     <td>Mathematical modeling & Theory <span class="btn"><a href="courses/theo-modeling/TAED_2023_ModelPanorama.pdf">SLIDES</a></span><span class="btn"><a href="courses/theo-modeling/course_Day1_linking_theory_data.pdf">SLIDES</a></span></td>
   </tr>
-  <tr>
-    <td>**_Guest speaker_**: Kim Cuddington (Waterloo Univ., Canada) <span class="btn"><a href="https://www.ecotheory.ca/theorydata/datatheory.html">SLIDES</a></span></td>
+  <tr style="background-color:#f0f2ed">
+    <td>**_Guest seminar_**: Kim Cuddington (Waterloo Univ., Canada) <span class="btn"><a href="https://www.ecotheory.ca/theorydata/datatheory.html">SLIDES</a></span></td>
   </tr>
   
   <tr>
-    <td rowspan="3">**Tuesday**</td>
-    <td>**_Speakers_**: Emanuel Fronhofer, Jhelam Deshpande & Benjamin Rosenbaum</td>
+    <td rowspan="2">**Tuesday**</td>
+    <td>**_Speakers_**: Emanuel Fronhofer & Jhelam Deshpande </td>
   </tr>
   <tr>
-    <td>Temporal series and dynamics in ecology <span class="btn"><a href="time-series/emmanuel/fronhofer_day2_cesab_theomodive.pdf">SLIDES</a></span><span class="btn"><a href="courses/time-series/benjamin/time_series_data_talk.pdf">SLIDES</a></span></td>
+    <td>Temporal series and dynamics in ecology <span class="btn"><a href="time-series/emmanuel/fronhofer_day2_cesab_theomodive.pdf">SLIDES</a></span></td>
   </tr>
-  <tr>
-    <td>**_Guest speaker_**: Frédéric Barraquand (CNRS, Bordeaux) <span class="btn"><a href="https://raw.githubusercontent.com/fbarraquand/overcompensating-popdyn-models/main/popdyn-vole-models.pdf">SLIDES</a></span></td>
-  </tr>
-  
-  <tr>
+
+  <tr style="background-color:#f0f2ed">
     <td rowspan="3">**Wednesday**</td>
-    <td>**_Speakers_**: Vincent Calcagno & Maxime Dubart</td>
+    <td>**_Speakers_**: Vincent Calcagno & Quentin Petitjean</td>
   </tr>
-  <tr>
+  <tr style="background-color:#f0f2ed">
     <td>Spatial data, macro-ecology and co-occurrences <span class="btn"><a href="courses/spatial-data/TDAED_slides.pdf">SLIDES</a></span></td>
   </tr>
-  <tr>
-    <td>**_Guest speaker_**: Davide Martinetti (INRAE, Avignon) <span class="btn"><a href="courses/spatial-data/Martinetti_SDM_PopilliaJaponica2.pdf">SLIDES</a></span></td>
+  <tr style="background-color:#f0f2ed">
+    <td>**_Guest seminar_**: Davide Martinetti (INRAE, Avignon) <span class="btn"><a href="courses/spatial-data/Martinetti_SDM_PopilliaJaponica2.pdf">SLIDES</a></span></td>
   </tr>
   
   <tr>
-    <td rowspan="3">**Thursday**</td>
-    <td>**_Speakers_**: François Massol, Claire Jacquet & Matthieu Barbier</td>
+    <td rowspan="4">**Thursday**</td>
+    <td>**_Speakers_**: François Massol & Claire Jacquet</td>
   </tr>
   <tr>
-    <td>Interaction networks, trophic networks & complexity <span class="btn"><a href="courses/networks/Day4_Networks_2023.pdf">SLIDES</a></span><span class="btn"><a href="courses/networks/matthieu/MB_cesab.pdf">SLIDES</a></span><span class="btn"><a href="courses/networks/Claire/empirical_food_webs_2023.pdf">SLIDES</a></span></td>
+    <td>Interaction networks, trophic networks & complexity <span class="btn"><a href="courses/networks/Day4_Networks_2023.pdf">SLIDES</a></span><span class="btn"><a href="courses/networks/Claire/empirical_food_webs_2023.pdf">SLIDES</a></span></td>
+  </tr>
+   <tr>
+    <td>**_Guest speaker_**: Matthieu Barbier (CIRAD, Montpellier & INTP) <span class="btn"><a href="courses/networks/matthieu/MB_cesab.pdf">SLIDES</a></span></td>
   </tr>
   <tr>
-    <td>**_Guest speaker_**: Sonia Kéfi (CNRS, Montpellier) <span class="btn"><a href="courses/networks/2022_05_cesab_Kefi.pdf">SLIDES</a></span></td>
+    <td>**_Guest seminar_**: Sonia Kéfi (CNRS, Montpellier) <span class="btn"><a href="courses/networks/2022_05_cesab_Kefi.pdf">SLIDES</a></span></td>
   </tr>
   
-  <tr>
+  <tr style="background-color:#f0f2ed">
     <td>**Friday**</td>
     <td>Subgroups projects</td>
   </tr>
