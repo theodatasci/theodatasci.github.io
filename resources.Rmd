@@ -13,8 +13,35 @@ knitr::opts_chunk$set(echo = FALSE)
 <br/>
 
 
+**Recommended papers - models**
 
-**Recommended papers**
+- Franck C, Dunne JA, Le Maho Y, May RM, Thébaud C, Hochberg ME (2015) Fundamental ecology is fundamental. **_Trends in Ecology & Evolution_**, 30(1):9-16 (https://doi.org/10.1016/j.tree.2014.11.005)
+
+- Grainger TN, Senthilnathan A, Ke P-J, Barbour MA, Jones NT, DeLong JP, Otto SP, O’Connor MI, Coblentz KE, Goel N, Sakarchi J, Szojka MC, Levine JM & Germain RM (2022) An Empiricist’s Guide to Using Ecological Theory. **_The American Naturalist_**, 199(1): 1-20 (https://doi.org/10.1086/717206)
+
+**Recommended papers - time**
+
+- Fronhofer EA, Govaert L, O'Connor MI, Schreiber, SJ. & Altermatt F (2024) The shape of density dependence and the relationship between population growth, intraspecific competition and equilibrium population density. **_Oikos_**, 2024(2): e09824 (10.1111/oik.09824)
+
+- Rosenbaum B & Fronhofer EA (2023) Confronting population models with experimental microcosm data: from trajectory matching to state-space models. **_Ecosphere_**, 14(4):e4503 (10.1002/ecs2.4503)
+
+- Huneman P (2019) How the Modern Synthesis Came to Ecology. **_J. Hist. Biol._**, 52(4):635-686 (10.1007/s10739-019-09570-9)
+
+- Mallet J (2012) The struggle for existence: how the notion of carrying capacity, K, obscures the links between demography, Darwinian evolution, and speciation. **_Evol. Ecol. Res._**, 14(5):627-665
+
+**Recommended papers - networks**
+
+- Bascompte J (2009) Disentangling the Web of Life. **_Science_**, 325,416-419, (https://www.science.org/doi/10.1126/science.1170749)
+
+- May RM (1972) Will a large complex system be stable? **_Nature_**, doi: [10.1038/238413a0](https://doi.org/10.1038/238413a0).
+&nbsp;[**PDF**](biblio/may-1972.pdf)
+
+- Williams RJ & Martinez ND (2000) Simple rules yield complex food webs. **_Nature_**, doi: [10.1038/35004572](https://doi.org/10.1038/35004572).
+&nbsp;[**PDF**](biblio/williams-2000.pdf)
+
+**Additional references**
+
+- Akjouj, I., Barbier, M., Clenet, M., Hachem, W., Maïda, M., Massol, F., Najim, J. & Tran, V. C. (2024) Complex systems in ecology: a guided tour with large Lotka–Volterra models and random matrices. **_Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences_**, 480, 20230284.
 
 - Cohen JE & Briand F (1984) Trophic links of community foodwebs. **_PNAS_**, doi: [10.1073/pnas.81.13.4105](https://doi.org/10.1073/pnas.81.13.4105).
 &nbsp;[**PDF**](biblio/cohen-1984.pdf)
@@ -40,9 +67,6 @@ knitr::opts_chunk$set(echo = FALSE)
 - Lewinsohn TM _et al._ (2006) Structure in plant-animal interaction assemblages. **_Oikos_**, doi: [10.1111/j.0030-1299.2006.14583.x](https://doi.org/10.1111/j.0030-1299.2006.14583.x).
 &nbsp;[**PDF**](biblio/lewinsohn-2006.pdf)
 
-- May RM (1972) Will a large complex system be stable? **_Nature_**, doi: [10.1038/238413a0](https://doi.org/10.1038/238413a0).
-&nbsp;[**PDF**](biblio/may-1972.pdf)
-
 - Newman MEJ (2006) Modularity and community structure in networks. **_PNAS_**, doi: [10.1073/pnas.0601602103](https://doi.org/10.1073/pnas.0601602103).
 &nbsp;[**PDF**](biblio/newman-2006.pdf)
 
@@ -58,10 +82,5 @@ knitr::opts_chunk$set(echo = FALSE)
 - Thomas M _et al._ (2015) Chapter 6 - A network-based method to detect patterns of local crop biodiversity: Validation at the species and infra-species levels. **_Advances in Ecological Research_**, doi: [10.1016/bs.aecr.2015.10.002](https://doi.org/10.1016/bs.aecr.2015.10.002).
 &nbsp;[**PDF**](biblio/thomas-2015.pdf)
 
-- Williams RJ & Martinez ND (2000) Simple rules yield complex food webs. **_Nature_**, doi: [10.1038/35004572](https://doi.org/10.1038/35004572).
-&nbsp;[**PDF**](biblio/williams-2000.pdf)
-
 - Yang Z, Algesheimer R & Tessone CJ (2016) A comparative analysis of community detection algorithms on artificial networks. **_Scientific Reports_**, doi: [10.1038/srep30750](https://doi.org/10.1038/srep30750).
 &nbsp;[**PDF**](biblio/yang-2016.pdf)
-
-
