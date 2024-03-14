@@ -1,0 +1,676 @@
+---
+title: "How to analyse a model"
+author: "Isabelle Gounand"
+date: "2024-03-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Analyzing the Rosenzweig  and MacArthur model
+
+$\frac{dP}{dt}=r_0P(1-\frac{P}{K}) - \frac{aPH}{1+ahP}$
+
+$\frac{dH}{dt}= - mH+ \epsilon\frac{aPH}{1+ahP}$
+
+```{r rma_model,echo = FALSE}
+
+library(deSolve)
+
+# Rosenzweig and MacArthur model, function of the derivatives
+rma_model <- function(t, y, parms) {
+  with(as.list(c(y, parms)), {
+    dP = r0*P*(1-P/K) - a*P*H/(1+P*a*h)
+    dH =  eps*a*P*H/(1+P*a*h) - m*H
+    list(c(dP,dH))
+  })
+}
+
+
+```
+
+## Find the equilibria
+
+Solve the system when:
+
+$\frac{dP}{dt}=0$ 
+
+AND 
+
+$\frac{dH}{dt}=0$
+
+That is express $P^*$ and $H^*$ with only the parameters when the derivatives of the system are null.
+By hand when simple enough or with software doing symbolic calculus like Maxima (open source), Mathematica or Matlab (commercial).
+
+We can study this by tracing the isoclines in the phase plan of P against H population densities, that is the criteria for which each of the equations equals zero. The equilibria are the intersection points within the feasible space:  $(P, H)>= 0$ 
+
+```{r trace_isoclines}
+# non-zero isocline functions 
+zeroP = function(r0,K,a,h, P){r0/a*(1+P*a*h)*(1-P/K)}
+zeroH = function(eps,a,h,m){m/(a*(eps-m*h))}
+
+
+# Set the parameter values
+r0 = 1
+K = 3.5
+a= 1.3
+eps= 0.75
+m=0.5
+h=0.8
+pars = c(r0 = r0, a = a, eps = eps, m=m, h=h,K=K)
+
+
+# Set an array of P values
+Ps = seq(0,K,by=0.1)
+
+
+# calculate the isoclines for the given parameter set
+H_zerogrowth = zeroH(eps,a,h,m)
+P_zerogrowth = zeroP(r0,K,a,h,Ps)
+
+colo = c("chartreuse3","darkorange3")
+
+
+# plot isoclines
+plot(NA,xlim = c(0,K*1.2),ylim = c(0,max(P_zerogrowth)*1.2),xlab="P",ylab="H",las=1,main = "Isoclines in phase plane")
+abline(h=0,col=colo[2],lwd=2)
+abline(v=c(0,H_zerogrowth),col=colo,lwd=2)
+lines(Ps[P_zerogrowth>=0],P_zerogrowth[P_zerogrowth>=0],col=colo[1],lwd=2)
+
+# Matrix of all equilibria
+pstar = zeroH(eps,a,h,m)
+hstar = zeroP(r0,K,a,h, pstar)
+alleqs = matrix(c(0,0,K,0,pstar,hstar),ncol=2,byrow=T,dimnames=list(NULL,c("P","H")))
+
+# Plot equilibria at intersection of H and P isoclines
+points(alleqs[,"P"],alleqs[,"H"],lwd=2)
+```
+
+
+Here we get three possible equilibria:
+
+$P^*=0$, $H^*=0$
+
+$P^*=K$, $H^*=0$
+
+$P^*=\frac{m}{a(\epsilon-hm)}$, $H^*=\frac{\epsilon(aKr_0(\epsilon-hm)-m)}{a^2K(\epsilon-hm)^2}$
+
+
+We still need to analyse the stability of these equilibrium points but if the coexistence equilibrium is an attractor,
+what can we say from the expression of these equilibria is:
+
+- $P^*$ decreases with $a$ and $\epsilon$n and increases with $h$.
+
+These equilibria are ecologically meaningfull when $P$ and $H$ are positive:
+- Criterium for $P$ persistence: $\epsilon > hm$
+- Criterium for $H$ persistence: $Kr_0a\epsilon > \frac{m}{1-hm}$
+
+
+
+Further we can trace trajectories with different starting point to see to which equilibria they are attracted
+
+```{r trace_isoclines_flowfield_with_trajectories}
+
+# simulation time array
+simtime = seq(0,1000,by = 0.1)     
+
+#... Dynamic 1
+yini1 = c(P=0.5,H=0.1)     #... initial conditions
+dyn1 = data.frame(ode(y = yini1, times = simtime, func = rma_model, parms = pars, method = "rk4"))   #... run dynamics
+
+#... Dynamics 2
+yini2 = c(P=3,H=1)   #... initial conditions
+dyn2 = data.frame(ode(y = yini2, times = simtime, func = rma_model, parms = pars, method = "rk4"))   #... run dynamics
+
+# maximum values for plot scales
+xmax = max(c(dyn1[,"P"],dyn2[,"P"]))*1.2
+ymax = max(c(dyn1[,"H"],dyn2[,"H"]))*1.2
+
+
+# plot isoclines
+plot(NA,xlim = c(0,xmax),ylim = c(0,ymax),xlab="P",ylab="H",las=1, main="Phase plane\nisoclines, flow field and trajectories")
+abline(h=0,col=colo[2],lwd=2)
+abline(v=c(0,H_zerogrowth),col=colo,lwd=2)
+lines(Ps[P_zerogrowth>=0],P_zerogrowth[P_zerogrowth>=0],col=colo[1],lwd=2)
+
+# Add the flow field
+library(phaseR)
+flowfield = flowField(rma_model,xlim = c(0,xmax) ,ylim = c(0,ymax) , parameters = pars, points = 19, state.names = c("P","H"),add=T,las=1)
+
+# Add the intersection points (equilibria)
+points(alleqs[,"P"],alleqs[,"H"],lwd=2)
+
+points(yini1[1],yini1[2],pch=16)           #... plot the initial point
+lines(dyn1[,"P"],dyn1[,"H"])               #... plot the trajectory of the dynamics
+points(dyn1[nrow(dyn1),"P"],dyn1[nrow(dyn1),"H"],pch=4,cex=2,lwd=3,col="red")  #...  endpoint
+
+
+points(yini2[1],yini2[2],pch=16,col="purple")     #... plot the initial point
+lines(dyn2[,"P"],dyn2[,"H"],col="purple",lty=2)   #... plot the trajectory of the dynamics
+points(dyn2[nrow(dyn2),"P"],dyn2[nrow(dyn2),"H"],pch=4,cex=2,lwd=3,col="red")  #... endpoint
+
+
+
+```
+
+## Study the equilibria stability
+
+To evaluate if these equilibrium are stable we need to evaluate the eigenvalues of the Jacobian matrix of the system at the specific equilibrium. The system is a stable node if the largest eigen value has a negative real part.
+
+
+```{r local_stability1}
+
+library(rootSolve)
+
+# Initial values of the variables
+yini = c(P=1,H=1) 
+pars = c(r0 = 0.5, a = 0.9, eps = 0.5, m=0.5, h=0.4,K=7)
+
+# Find the numerical steady-state (for a specific parameter set and initial densities)
+Eq = stode(y = yini,func=rma_model,parms=pars,positive = TRUE)[[1]]
+
+
+# Function with the differential equations to evaluate the jacobian matrix
+jac <- function(t, y, parms) {
+  with(as.list(c(y, parms)), {
+    dP = r0*P*(1-P/K) - a*P*H/(1+P*a*h)
+    dH =  eps*a*P*H/(1+P*a*h) - m*H
+    list(dP,dH)
+  })
+}
+
+# Calculate the jacobian
+J = jacobian.full(y=Eq,func=jac,parms=pars)
+
+
+# Show the eigenvalues and the real part of the largest eigenvalue
+eigen(J)$values
+max(Re(eigen(J)$values))
+```
+
+For this parameter set, the dominant eignvalue has a negative real part, then the system is unstable. Actually it is an oscillating attractor.
+
+## Bifuraction diagrams
+
+A way to explore the model behavior is to plot the asymptotic (long-term) result along a gradient for a given parameter.
+Because some asymptotic behavior can be oscillating, we record minima and maxima on a time window (which should be large enough to contin at least one complete oscillation) at the end of dynamics for each parameter set, while changind the value of the focal parameter:
+
+
+```{r bifurcation_loop}
+
+# Set the parameter values
+r0 = 0.5     
+K = 20
+a=0.7
+eps=0.3
+m=0.4
+h=0.4
+pars = c(r0 = r0, a = a, eps = eps, m=m, h=h,K=K)
+
+# Array of K values (Carrying capacity is our focal parameter)
+Ks = seq(0.5,20,length=70)
+
+simtime = seq(0,2000,by = 0.1)     # simulation time
+yini = c("P"=1,"H"=1)              # initial densities
+
+# initialize a dataframe to record the extrema along the K gradient
+eqs = data.frame(P_min=NULL,P_max=NULL,H_min=NULL,H_max=NULL)
+
+# loop to change K 
+for(i in 1: length(Ks)){
+  pars["K"] = Ks[i]
+  dyn = data.frame(ode(y = yini, times = simtime, func = rma_model, parms = pars, method = "rk4"))
+  dynend = dyn[(nrow(dyn)-1000):nrow(dyn),]
+  eqs = rbind(eqs,data.frame(P_min=min(dynend[,"P"]),P_max=max(dynend[,"P"]),H_min=min(dynend[,"H"]),H_max=max(dynend[,"H"])))
+}
+
+# Takes a bit of time because we need to set a maximum time large enough to be sure we reach equilibria
+
+```
+
+
+Plot the resulting bifurcation diagram
+
+```{r plot_bifurcation}
+colos = rep(colo,each=2)
+plot(NA,xlim = range(Ks),ylim=range(eqs),xlab="K",ylab="Extremum densities",las=1, main="Bifurcation diagram")
+for(i in 1:4)points(Ks,eqs[,i],pch=16,col=colos[i])
+legend("topleft",pch=16,col=colo,legend=c("P","H"),bty="n")
+
+```
+At low K, H is not present and P increases with K. At intermediate K, H survives and the system is stable. H regulates P and P density is constant and only depends on H's parameters. H densities benefits from increase in K. At higher K, the system is destabilizes and oscillates, due to a to large P population growth that is transferred with a delay to herbivores, that then explodes and overgraze the plants (paradox of enrichment sensu Rosenzweig 1971). 
+
+
+The same bifurcation diagram can be done with the real part of the dominant eigenvalue of the Jacobian matrix to visualizing in another way the change in stability with K
+
+```{r lambdamax_bifurcation}
+
+lambdamax = NULL 
+
+
+for(i in 1: length(Ks)){
+  pars["K"] = Ks[i]
+  Eq = stode(y = yini,func=rma_model,parms=pars,positive = TRUE)[[1]]
+  J = jacobian.full(y=Eq,func=jac,parms=pars)
+  lambdamax = c(lambdamax,max(Re(eigen(J)$values)))
+}
+
+plot(Ks,lambdamax,xlab="K",ylab="real part of dominant eigenvalue",pch=16,las=1,main="Bifurcation diagram, stability")
+abline(h=0,lty=3)
+
+
+```
+
+## Multiple equilibria
+
+Some models can display multiple attractors (asymptotic trajectories to which the system is attracted) either stable or unstable for the same parameter set. This means that, depending on the initial conditions, we will end up with different densities.
+
+A quick example with the Lotka-Volterra competition model (NB: the Rosenzweig Mac-Arthur model doesn't display bistability:
+
+$\frac{dN_1}{dt}=r_1N_1(1-\frac{N_1+\alpha_{21}N_2}{K_1}$
+$\frac{dN_2}{dt}=r_2N_2(1-\frac{N_2+\alpha_{12}N_1}{K_2}$
+
+with $\alpha_{21}$ the effect of species 2 on the growth rate of species 1
+
+
+```{r bistable_dynamics}
+
+# Lotka-Volterra 2-species competition model (function of derivatives)
+lv_compet_ode <- function(t, y,parms) {
+  with(as.list(c(y, parms)), {
+    return(list(c(r1*y[1]*(1-(y[1]+a21*y[2])/K1),
+                  r2*y[2]*(1-(y[2]+a12*y[1])/K2))))
+  })
+}
+
+# Parameter set
+pars=c(r1=0.1,r2=0.2,a12=1.5,a21=1.5,K1=15,K2=20)
+
+# time array
+simtime = seq(0,600,by = 0.1)
+
+# first dynamics
+init1 = c(5,5)                # initial densities
+dyn1 = data.frame(ode(y = init1, times = simtime, func = lv_compet_ode, parms = pars, method = "rk4")) # run the dynamics
+
+# second dynamics
+init2 = c(10,1)               # initial densities
+dyn2 = data.frame(ode(y = init2, times = simtime, func = lv_compet_ode, parms = pars, method = "rk4")) # run the dynamics
+
+# Plot the dynamics for each initial conditions
+layout(matrix(1:2,ncol=2))
+coloN = c("darkorange","cyan3")
+
+plot(dyn1[,1],dyn1[,2],xlab="times",ylim=range(dyn1[,2:3]),las=1,ylab="densities",main=paste("P0 =",init1[1],"H0 =",init1[2]),type="l",col=coloN[1],lwd=2)
+lines(dyn1[,1],dyn1[,3],col=coloN[2],lwd=2)
+legend("right",lwd=2,col=coloN,legend=c("N1","N2"),bty="n")
+
+plot(dyn2[,1],dyn2[,2],xlab="times",ylim=range(dyn2[,2:3]),las=1,ylab="densities",main=paste("P0 =",init2[1],"H0 =",init2[2]),type="l",col=coloN[1],lwd=2)
+lines(dyn2[,1],dyn2[,3],col=coloN[2],lwd=2)
+
+```
+
+### Findall equilibria with `nleqslv`
+
+The principle is that we must run the dynamics for multiple initial conditions to find all the equilibria and then evaluate the stability of each to see if there are more than one stable equilibrium for the given parameter set.
+
+```{r findallEq}
+library(nleqslv)
+
+# Lotka-Volterra model
+lv_compet_model <- function(x, parms) {
+  with(as.list(parms), {
+    return(c(r1*x[1]*(1-(x[1]+a21*x[2])/K1),
+             r2*x[2]*(1-(x[2]+a12*x[1])/K2)))
+  })
+}
+
+# A matrix of initial densities from uniform distributions
+yinimat = cbind(N1=runif(1000,min=0,max=20),N2=runif(100,min=0,max=20))
+
+# Parameter set
+pars=c(r1=0.1,r2=0.2,a12=1.5,a21=1.5,K1=15,K2=20)
+
+# search all equilibria
+eqs = searchZeros(yinimat,fn=lv_compet_model,parms=pars,control=list(xtol=10e-11,ftol=10e-11,allowSingular=TRUE))$x
+
+# set to zero the near-zero values to exclude precision issue)
+eqs = ifelse(eqs<0.0000001,0,eqs)   
+
+## NB: searchZeros function can be useful if it is not possible to get the analytical equilibria (which is not the case here, so the code is just provided as an example), though precision seems to be some times problematic 
+
+
+## Evaluate the stability of each equilibria we get
+# formulation for jacobian
+jac_lv <- function(t, x, parms) {
+  with(as.list(c(x, parms)), {
+    list(r1*x[1]*(1-(x[1]+a21*x[2])/K1),
+         r2*x[2]*(1-(x[2]+a12*x[1])/K2))
+  })
+}
+
+# Function to determine stability
+stability_lv = function(Eq,pars){
+  Jac = jacobian.full(y=Eq,func=jac_lv,parms=pars)     # calculate the Jacobian at equilibrium
+  lambdamax = max(Re(eigen(Jac)$values))               # calculate the real part of the dominant eignevalue
+  if(lambdamax < 0) return(1)                          # record stability (stable 1, unstable 0)
+  else return(0)
+}
+
+# find the stability of each equilibrium
+stab = numeric(nrow(eqs))
+for(i in 1:nrow(eqs))stab[i] = stability_lv(eqs[i,],pars)
+a = cbind(eqs,stab)
+
+a
+```
+
+
+
+Analytical equilibria for the Lotka-Volterra two-species competition model:
+
+$N_1^*=0, N_2^*=0$
+$N_1^*=K_1, N_2^*=0$
+$N_1^*=0, N_2^*=K_2$
+$N_1^*=\frac{K_1-\alpha_{21}K_2}{1-\alpha_{21}\alpha_{12}}, N_2^*=\frac{K_2-\alpha_{12}K_1}{1-\alpha_{21}\alpha_{12}}$
+
+
+
+```{r bifurcation_two_species_LV}
+
+# Function to calculate equilibria from analytical formulas (2-column matrix with each row an equilibrium point)
+lv_compet_eqs=function(pars){
+  return(cbind(N1=c(0,pars["K1"],0,(pars["K1"]-pars["a21"]*pars["K2"])/(1-pars["a21"]*pars["a12"])),
+               N2=c(0,0,pars["K2"],(pars["K2"]-pars["a12"]*pars["K1"])/(1-pars["a21"]*pars["a12"]))))
+}
+
+
+coloN = c("darkorange","cyan3")
+
+# Number of values for the gradient
+n=50
+
+# Gradient of values for the interspecific competition coefficient a12
+a12s = seq(0.5,1.5,length=n)
+
+
+# parameter array
+pars=c(r1=0.1,r2=0.2,a12=0.5,a21=1.5,K1=15,K2=20)
+
+# object to record the equilibrium as well as the a12 values
+res = c(a12 = NULL, N1=NULL,N2=NULL)
+
+# For loop to change a12
+for(i in 1:n){
+  pars["a12"] = a12s[i]                                     # change the parameter value
+  eqs = lv_compet_eqs(pars)                                 # calculate all equilibria
+  stab = numeric(nrow(eqs))                                 # create an array to record stability
+  for(j in 1:nrow(eqs))stab[j] = stability_lv(eqs[j,],pars) # assess equilibrium stability
+  
+  # record all the stable equilibria
+  stable_eqs = eqs[which(stab==1),]
+  if(length(stable_eqs) == 2){
+    res = rbind(res, c(pars["a12"], c(stable_eqs["N1"]),stable_eqs["N2"]))
+  }else{
+    res = rbind(res, cbind(rep(pars["a12"],nrow(stable_eqs)),stable_eqs[,"N1"],stable_eqs[,"N2"]))
+  }
+}
+
+# keep only the ones meeting feasibility criteria (densities > 0)
+res_def =  res[which(res[,2]>=0 & res[,3]>=0 ),]
+
+# plot all stable equilibrium states
+plot(res_def[,"a12"],res_def[,"N1"],pch=16,col=coloN[1],ylim=c(0,max(res_def[,2:3])),xlab="a_12",ylab="equilibrium densities",las=1, main = "Multiple stable states\nLotka-Volterra 2-species competition")
+points(res_def[,"a12"],res_def[,"N2"],pch=2,col=coloN[2])
+
+
+```
+
+For this parameter set, we have a zone of bistability at the end of the gradient where it's one or the other species excluding the second species.
+
+
+```{r check_dynamics}
+# Check dynamics for the first area
+pars["a12"] = 1.4
+
+yinit1 = c(20,1)
+yinit2 = c(5,15)
+dyn1 = data.frame(ode(y = yinit1, times = simtime, func = lv_compet_ode, parms = pars, method = "rk4"))
+dyn2 = data.frame(ode(y = yinit2, times = simtime, func = lv_compet_ode, parms = pars, method = "rk4"))
+
+
+# Plot the dynamics for each initial conditions
+layout(matrix(1:2,ncol=2))
+coloN = c("darkorange","cyan3")
+
+plot(dyn1[,1],dyn1[,2],xlab="times",ylim=range(dyn1[,2:3]),las=1,ylab="densities",main=paste("P0 =",init1[1],"H0 =",init1[2]),type="l",col=coloN[1],lwd=2)
+lines(dyn1[,1],dyn1[,3],col=coloN[2],lwd=2)
+legend("right",lwd=2,col=coloN,legend=c("N1","N2"),bty="n")
+
+plot(dyn2[,1],dyn2[,2],xlab="times",ylim=range(dyn2[,2:3]),las=1,ylab="densities",main=paste("P0 =",init2[1],"H0 =",init2[2]),type="l",col=coloN[1],lwd=2)
+lines(dyn2[,1],dyn2[,3],col=coloN[2],lwd=2)
+
+```
+
+
+
+### 2-D parameter set exploration of stability and coexistence for the Rosenzweig-MacArthur model
+
+In the following code we explore a 2D parameter space while varying the herbivore parameters *a* (grazing rate) and *h* (handling time)
+
+```{r 2D_parameter_exploration}
+
+col_coex = c("grey","chartreuse3","purple")
+
+# Function to calculate equilibria from analytical formulas 
+# (the output is a matrix with P and H the columns and the equilibria in rows)
+rma_eqs=function(r0,K,a,h,eps,m){
+  z = eps-h*m
+  P=c(0,K,m/(a*eps-a*h*m))
+  H=c(0,0,(eps*r0*(a*K*z-m))/(a^2*K*z^2))
+  return(cbind(P,H))
+}
+
+# Set the parameter values
+r0 = 0.5    
+K = 20
+a=0.7
+eps=0.3
+m=0.4
+h=0.4
+
+#... sequence of variation
+n=30
+a_s = seq(0.05,1.2,length=n)
+h_s = seq(0.05,1.2,length=n)
+
+#... object to record the parameters values, 
+#... coexistence (0: none; 1: P only; 2: P, H), and stability (0: unstable; 1: stable)
+res = c(h=NULL,a=NULL,coex=NULL,stab=NULL)
+
+#... Nested loops to vary the parameters
+for(a in a_s){
+  for(h in h_s){
+    eqs = rma_eqs(r0,K,a,h,eps,m)                            # calculate the equilibria
+    pars = c(r0 = r0, a = a, eps = eps, m=m, h=h,K=K)       # parameter array
+    
+    # NB: we know that there is only one attractor for each parameter set in this model, either stable or oscillating 
+    if(eqs[3,"P"]>0 & eqs[3,"H"]>0 ){                      # if the coexistence equilibrium is feasible (positive densities)
+      JPH = jacobian.full(y=eqs[3,],func=jac,parms=pars) # calculate the Jacobian matrix at coexistence equilibrium
+      stab = ifelse(max(Re(eigen(JPH)$value))<0,1,2)     # assess stability
+      res = rbind(res,c(h=h,a=a,coex=3,stab=stab))       # record the results
+    }else{
+      JP = jacobian.full(y=eqs[2,],func=jac,parms=pars)    # if the coexistence equilibrium in not feasible, 
+      # then only P persists. Calculate the jacobian for P alone 
+      if(max(Re(eigen(JP)$value))<0){                      
+        res = rbind(res,c(h=h,a=a,coex=2,stab=1))          # if P alone equilibrium is stable, then, record it
+      }else{
+        res = rbind(res,c(h=h,a=a,coex=1,stab=1))          # otherwise the stable equilibrium is necessary the last one
+      }
+    }
+  }
+} 
+
+
+# Plot the results in the 2-D parameter space with colours coding coexistence
+plot(res[,"h"],res[,"a"],pch=16,xlab="h",ylab="a",col=col_coex[res[,"coex"]],main="coexistence and stability",las=1)
+# add white point where the dynamics is unstable
+points(res[which(res[,"stab"]==2),"h"],res[which(res[,"stab"]==2),"a"],pch=16,cex=0.5,col="white")
+legend("topright",pch=16,col=col_coex[c(2,3,3)],legend=c("P","PH stable","PH unstable"))
+legend("topright",pch=16,col=c(col_coex[c(2,3)],"white"),pt.cex=c(1,1,0.5),legend=c("P","PH stable","PH unstable"),bty="n")
+
+```
+
+Look at one transect for $a=0.6$
+
+```{r transect}
+
+# Set the parameter values
+r0 = 0.5     # r0 = 0.1
+K = 20
+a=0.6
+eps=0.3
+m=0.4
+h=0.4
+
+# parameter array
+
+
+# gradient of h values
+h_s = seq(0.05,1.2,length=n)
+
+simtime = seq(0,2000,by = 0.1)     # simulation time
+yini = c("P"=1,"H"=1)              # initial densities
+
+# object to record results
+eqs = data.frame(P_min=NULL,P_max=NULL,H_min=NULL,H_max=NULL)
+
+for(h in h_s){
+  pars = c(r0 = r0, a = a, eps = eps, m=m, h=h,K=K)        # parameter array
+  dyn = data.frame(ode(y = yini, times = simtime, func = rma_model, parms = pars, method = "rk4")) # run the dynamic
+  dynend = dyn[(nrow(dyn)-1000):nrow(dyn),]                # select the end of the dynamics (asymptotic state)
+  
+  # record extrema
+  eqs = rbind(eqs,data.frame(P_min=min(dynend[,"P"]),P_max=max(dynend[,"P"]),H_min=min(dynend[,"H"]),H_max=max(dynend[,"H"])))
+}
+
+# Plot the results
+colos = rep(colo,each=2)
+plot(NA,xlim = range(h_s),ylim=range(eqs),xlab="h",ylab="Extremum densities",las=1, main = "Transect for a = 0.6")
+for(i in 1:4)points(h_s,eqs[,i],pch=16,col=colos[i])
+legend("topleft",pch=16,col=colo,legend=c("P","H"),bty="n")
+
+
+```
+
+## Model comparison
+
+Compare the results of coexistence and stability in the $K$, $a$ parameter space for two models, one with a linear functional response and the other a saturating one (our previous Rsenzweig and MacArthur model).
+
+
+```{r model_comparison}
+
+final_state_types = c("none","P","P-H")
+col_coex = c("grey","chartreuse3","purple")
+
+
+# Set the parameter values
+r0 = 0.5     # r0 = 0.1
+K = 20
+a=0.7
+eps=0.3
+m=0.4
+h=0.4
+
+#... sequence of variation
+n=30
+a_s = seq(0.05,1.2,length=n)
+K_s = seq(0.05,20,length=n)
+
+# Function to calculate equilibria from analytical formulas for the model with linear functional response
+rma_linear_eqs=function(r0,K,a,eps,m){
+  P=c(0,K,m/(a*eps))
+  H=c(0,0,(eps*a*K-m)/(a^2*K*eps))
+  return(cbind(P,H))
+}
+
+
+# Function to evaluate the jacobian matrix of the model with linear functional response
+jac_linear <- function(t, y, parms) {
+  with(as.list(c(y, parms)), {
+    dP = r0*P*(1-P/K) - a*P*H
+    dH =  eps*a*P*H - m*H
+    list(dP,dH)
+  })
+}
+
+
+# Objects to record the results for each model
+res_linear = c(K=NULL,a=NULL,coex=NULL,stab=NULL)
+res_nonlinear = c(K=NULL,a=NULL,coex=NULL,stab=NULL)
+
+
+# Nested loops to vary K and a parameters
+for(a in a_s){
+  for(K in K_s){
+    eqs_nonlinear = rma_eqs(r0,K,a,h,eps,m)
+    eqs_linear = rma_linear_eqs(r0,K,a,eps,m)
+    pars = c(r0 = r0, a = a, eps = eps, m=m, h=h,K=K)
+    
+    # Linear functional response model
+    if(eqs_linear[3,"P"]>0 & eqs_linear[3,"H"]>0 ){
+      JPH = jacobian.full(y=eqs_linear[3,],func=jac_linear,parms=pars)
+      stab = ifelse(max(Re(eigen(JPH)$value))<0,1,2)
+      res_linear = rbind(res_linear,c(K=K,a=a,coex=3,stab=stab))
+    }else{
+      JP = jacobian.full(y=eqs_linear[2,],func=jac_linear,parms=pars)
+      if(max(Re(eigen(JP)$value))<0){
+        res_linear = rbind(res_linear,c(K=K,a=a,coex=2,stab=1))
+      }else{
+        res_linear = rbind(res_linear,c(K=K,a=a,coex=1,stab=1))
+      }
+    }
+    
+    # Non linear functional response model
+    if(eqs_nonlinear[3,"P"]>0 & eqs_nonlinear[3,"H"]>0 ){
+      JPH = jacobian.full(y=eqs_nonlinear[3,],func=jac,parms=pars)
+      stab = ifelse(max(Re(eigen(JPH)$value))<0,1,2)
+      res_nonlinear = rbind(res_nonlinear,c(K=K,a=a,coex=3,stab=stab))
+    }else{
+      JP = jacobian.full(y=eqs_nonlinear[2,],func=jac,parms=pars)
+      if(max(Re(eigen(JP)$value))<0){
+        res_nonlinear = rbind(res_nonlinear,c(K=K,a=a,coex=2,stab=1))
+      }else{
+        res_nonlinear = rbind(res_nonlinear,c(K=K,a=a,coex=1,stab=1))
+      }
+    }
+  }
+} 
+
+# Plot the results for each model
+layout(matrix(1:2,ncol=2))
+
+plot(res_linear[,"K"],res_linear[,"a"],pch=16,xlab="K",
+     ylab="a",col=col_coex[res_linear[,"coex"]],main="Holling type I", las = 1)
+points(res_linear[which(res_linear[,"stab"]==2),"K"],res_linear[which(res_linear[,"stab"]==2),"a"],
+       pch=16,cex=0.5,col="white")
+
+legend("topright",pch=16,col=col_coex[c(2,3,3)],legend=c("P","PH stable","PH unstable"),cex=0.7)
+legend("topright",pch=16,col=c(col_coex[c(2,3)],"white"),pt.cex=c(1,1,0.5),legend=c("P","PH stable","PH unstable"),bty="n",cex=0.7)
+
+
+plot(res_nonlinear[,"K"],res_nonlinear[,"a"],pch=16,xlab="K",
+     ylab="a",col=col_coex[res_nonlinear[,"coex"]],main="Holling type II", las = 1)
+points(res_nonlinear[which(res_nonlinear[,"stab"]==2),"K"],res_nonlinear[which(res_nonlinear[,"stab"]==2),"a"],
+       pch=16,cex=0.5,col="white")
+
+
+
+
+```
+
+
+
+

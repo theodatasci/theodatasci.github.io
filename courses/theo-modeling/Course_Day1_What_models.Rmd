@@ -1,0 +1,314 @@
+---
+title: "Theory-driven Analysis of Ecological Data, Day 1 (1)"
+author: "Isabelle Gounand"
+date: "2024-02-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+```
+
+# What model formalism?
+
+## Stochastic versus deterministic models
+
+For our example, we use the simple density-dependent population growth model of Verhulst (logistic):
+
+$\frac{dN}{dt}=r_0N(1-\frac{N}{K})$
+
+which analytical solution is known:
+
+$n(t) = \frac{K}{1+(\frac{K}{N0}-1)*e^{-r_0t}}$
+
+The equations can be coded in R with the following function, which is then used to calculate the dynamics at each time point, while knowing parameter values and starting densities:
+
+
+```{r Verhulst_model_deterministic}
+  #... Analytical solution of Verhulst's model
+  verhulst_sol = function(N0,r0,K,t){
+    N = K / (1 + (K / N0 - 1) * exp(-r0 * t))
+    return(N)
+  }
+
+  #... Function to calculate the dynamics for the deterministic version of the model (with the analytical solution)
+  dyn_verhulst = function(n0,r0,K,tmax=250,h=0.1){
+    tseq = seq(0,tmax,by = h)                               #... define the time sequence
+    return(cbind(t=tseq,N=verhulst_sol(n0,r0,K,tseq)))
+  }
+
+
+
+```
+
+
+For an example of a stochastic model we simply propose to had a Gaussian noise representing demographic variability in birth and death rates for instance, classically formulated as depending on the square root of population densities as follows:
+
+$\frac{dN}{dt}=r_0N(1-\frac{N}{K}) + a\eta\sqrt{N}$ with $\eta$ a parameter drawn from a normal distribution of a certain variance $\sigma^2$ and $a$ a parameter to tune the intensity of the stochasticity.
+
+
+As we don't have the analytical solution, we have to approximate the temporal dynamics with numerical integration. Here, for simplicity, we use the Runge-Kutta algorithm of order 4 for numerical integration and add the stochastic term at each time point after the approximation on the deterministic model. We can use SDE instead: Stochastic Deterministic Equations (but I don't have expertise on that).
+
+
+```{r function_for_numerical_integration}
+
+  #... Differential equation of Verhulst's model
+  verhulst_ode = function(N,r0,K){
+    dN = r0 * N * (1 - N / K)
+    return(dN)
+  }
+
+
+  #... Runge-Kutta 4 algorithm for numerical integration of the Verhulst's model
+  #.............................................................................
+  #... n1: density at the previous time point; r0: growth rate; K: carrying capacity; h: time step
+    rk4_verhulst = function(n1,r0,K,h){
+    a1=verhulst_ode(N=n1,r0=r0,K=K)
+    b1=verhulst_ode(N=n1+h*a1/2,r0=r0,K=K)
+    c1=verhulst_ode(N=n1+h*b1/2,r0=r0,K=K)
+    d1=verhulst_ode(N=n1+h*c1,r0=r0,K=K)
+    return(c(n1+h*(a1+2*b1+2*c1+d1)/6))
+  }
+  
+  #... Function to calculate the dynamics for the stochastic version of the model (with the ODE)
+  dyn_verhulst_stoch = function(n0,r0,K,tmax=250,h=0.1,a=0.25,sdstoch=0.5){
+    n=c(n0)                                                     #... initialyse the vector of abundances
+    tseq = seq(h,tmax,by = h)                                   #... define the time sequence   
+    for(t in 1:length(tseq)){
+      newn0 = rk4_verhulst(n[t],r0,K,h)                          #... calculate new density at time t with  ode
+      newn = newn0 + a * rnorm(1,sd=sdstoch) * sqrt(newn0)       #... add stochastic demography term
+      if(newn < 0)newn = 0                                       #... set to 0 if the new density is negative
+      n=rbind(n,newn)                                            #... record the density
+    }
+    return(cbind("t"=c(0,tseq),"N"=n))
+  }
+
+
+```
+
+
+
+###  Case of large populations with high growth rate
+
+
+```{r parameters_stochatsitc_deterministic}
+
+#... Parameters
+Tmax = 500           #... maximum time
+h=0.1                #... time step (∆t)
+r0 = 0.1            #... population growth rate
+K = 2000             #... carrying capacity
+nrep_stoch = 10      #... number of stochastic replicates
+ast = 0.4            #... intensity of the stochastic noise
+sds = 1              #... standard deviation of the normal noise distribution          
+N0=30                #... initial density
+
+
+```
+
+
+```{r plot_stochatsitc_deterministic, echo=FALSE}
+
+set.seed(1)          #... set a seed to reproduce the same figures
+
+#... Stochastic dynamics (10 replicates)
+dynstoch = dyn_verhulst_stoch(N0,r0,K,Tmax,h,ast,sds)
+for(i in 2:nrep_stoch){
+  dynnew = dyn_verhulst_stoch(N0,r0,K,Tmax,h,ast,sds)
+  dynstoch = cbind(dynstoch,dynnew[,2])
+}
+meanstock = apply(dynstoch[,2:(nrep_stoch+1)],1,mean)    #... Mean of stochastic dynamics
+
+#... Deterministic dynamics
+dyndet = dyn_verhulst(N0,r0,K,Tmax,h)
+
+
+#... Two-panel plot
+layout(matrix(1:2,ncol=2))                  #... open the two-panel plot
+ylims = range(dynstoch[,2:(nrep_stoch+1)])  #... define Y-scale
+
+#... Plot stochastic dynamics
+plot(dynstoch[,1],dynstoch[,2],ylim=ylims,type="l",xlab="Time",ylab="N",main="Stochastic",lwd=1,col="chartreuse3",cex.lab=1.4,cex.axis=1.4,las=1)
+for(i in 3:(nrep_stoch+1))lines(dynstoch[,1],dynstoch[,i],col="chartreuse3",lwd=1)
+lines(dynstoch[,1],meanstock,lwd=2,col="darkgreen")
+abline(h=K,lty=3)
+
+plot(dyndet[,1],dyndet[,2],ylim=ylims,type="l",xlab="Time",ylab="N",main="Deterministic" ,lwd=2,cex.lab=1.4,cex.axis=1.4,las=1)
+
+
+```
+
+
+### Case of small populations with low growth rate (all other parameters being equal)
+
+```{r parameters_small_pop_stochastic}
+
+r0 = 0.04            #... population growth rate
+K = 200              #... carrying capacity
+
+```
+
+
+```{r plot_small_pop_stochastic, echo=FALSE}
+
+set.seed(2)          #... set a seed to reproduce the same figures
+
+#... Stochastic dynamics (10 replicates)
+dynstoch = dyn_verhulst_stoch(N0,r0,K,Tmax,h,ast,sds)
+for(i in 2:nrep_stoch){
+  dynnew = dyn_verhulst_stoch(N0,r0,K,Tmax,h,ast,sds)
+  dynstoch = cbind(dynstoch,dynnew[,2])
+}
+meanstock = apply(dynstoch[,2:(nrep_stoch+1)],1,mean)    #... Mean of stochastic dynamics
+
+#... Deterministic dynamics
+dyndet = dyn_verhulst(N0,r0,K,Tmax,h)
+
+
+#... Two-panel plot
+layout(matrix(1:2,ncol=2))                  #... open the two-panel plot
+ylims = range(dynstoch[,2:(nrep_stoch+1)])  #... define Y-scale
+
+#... Plot stochastic dynamics
+plot(dynstoch[,1],dynstoch[,2],ylim=ylims,type="l",xlab="Time",ylab="N",main="Stochastic",lwd=1,col="chartreuse3",cex.lab=1.4,cex.axis=1.4,las=1)
+for(i in 3:(nrep_stoch+1))lines(dynstoch[,1],dynstoch[,i],col="chartreuse3",lwd=1)
+lines(dynstoch[,1],meanstock,lwd=2,col="darkgreen")
+abline(h=K,lty=3)
+
+plot(dyndet[,1],dyndet[,2],ylim=ylims,type="l",xlab="Time",ylab="N",main="Deterministic" ,lwd=2,cex.lab=1.4,cex.axis=1.4,las=1)
+
+
+```
+In this case, there are higher probabilities that some species go extinct by chance. In the end the deterministic model is no more a good prediction because the distribution of the stochastic realizations for different pops is skewed toward lower density values.
+
+
+## Discrete versus continuous time models
+
+The discrete-time version of the Verhulst model can be written as followed:
+
+$N_{t+∆t} = N_t+ R_0 N_t(1-\frac{N_t}{K})*∆t$, wit $R_0$ the intrinsic growth rate in discrete time, and $∆t$ the time step.
+
+In this case, we  use the difference equation to approximate the density at the next time step depending of its state at the previous time step. In this implementation, we consider the density doesn't change between two steps. 
+
+```{r discrete_model}
+
+#... Difference equation function for the discrete-time Verhulst's model
+verhulst_discret = function(N0,R0,K,h){
+  N1 = N0+R0*N0*(1-N0/K)*h
+  return(c(N1))
+}
+
+#... Function to run the dynamic of the discrete-time Verhulst model between 0 and tmax
+dyn_discret = function(N0,R0,K,tmax,h){
+  res=data.frame(t=0,N=N0)
+  tseq_discrete = seq(h,tmax,by=h)                          #... define the time sequence
+  for(tt in tseq_discrete){
+    res = rbind(res,data.frame(t=tt,N=res[nrow(res),"N"]))  #... record density before growth event at time t + ∆t
+    newdens = verhulst_discret(res[nrow(res),"N"],R0,K,h)   #... calculate new density
+    if(newdens<0) newdens = 0                               #... if negative, population got extinct, density is set to 0
+    res = rbind(res,data.frame(t=tt,N=newdens))             #... record density after growth event at time t + ∆t
+  }
+  return(res)
+}
+
+```
+
+```{r parameters_discrete_vs_continuous_time}
+
+#... Parameters
+K=200
+r0=R0=0.1
+N0=20
+tmax = 200
+h=0.1
+stepsizes = c(0.1,1,5,10,15)       #... timesteps for discrete-time model
+
+
+```
+
+```{r plot_discrete_vs_continuous_tim, echo=FALSE}
+
+#... colors for variations
+colstep = c("chartreuse3","darkgoldenrod1","darkorange","deeppink3","brown")
+
+#... Calculate continuous and discrete time dynamics for 0.1 growth rate
+dyn_continuous_time = dyn_verhulst(N0,r0,K,tmax,h)
+dyn_discrete_time = dyn_discret(N0,R0,K,tmax,h=stepsizes[length(stepsizes)])
+
+#... Two-panel plot
+layout(matrix(1:2,ncol=2))                  #... open the two-panel plot
+
+#... Plot discrete-time dynamics
+plot(dyn_discrete_time[,"t"],dyn_discrete_time[,"N"],col=colstep[length(stepsizes)],lwd=2,type="l",xlab="Time",ylab="Population density",las=1,cex.lab=1.2,cex.axis=1.2,mgp=c(3,1,0),ylim = c(0,220),main="Discrete time")
+for(i in (length(stepsizes)-1):1){
+  dyn_discrete_new = dyn_discret(N0,R0,K,tmax,h=stepsizes[i])
+  lines(dyn_discrete_new[,"t"],dyn_discrete_new[,"N"],col=colstep[i],lwd=2)
+}
+lines(dyn_continuous_time[,"t"],dyn_continuous_time[,"N"],lty=3,lwd=2)
+abline(h=c(0,K),lty=3)
+legend("right",lty=3,legend=c("continuous time"),lwd=2,bty="n",cex=0.8)
+legend("bottomright",col=colstep,lty=1,legend=stepsizes,lwd=2,title="time step",bty="n",cex=0.8)
+
+plot(dyn_continuous_time[,"t"],dyn_continuous_time[,"N"],ylim = c(0,220),type="l",xlab="Time",ylab="Population density",las=1,cex.lab=1.2,cex.axis=1.2,lwd=2,mgp=c(3,1,0),main="Continuous time")
+abline(h=c(0,K),lty=3)
+
+```
+
+We can observe the discrete time model boils down to the continuous-time one for small time steps.
+
+
+# How to build a model?
+
+## The Rosenzweig and MacArthur model
+
+$\frac{dP}{dt}=r_0P(1-\frac{P}{K}) - \frac{aPH}{1+ahP}$
+
+$\frac{dH}{dt}= - mH+ \epsilon\frac{aPH}{1+ahP}$
+
+```{r rma_model}
+#install.packages("deSolve")
+library(deSolve)  #... library for numerical integration
+
+# Rosenzweig and MacArthur model
+rma_model <- function(t, y, parms) {
+  with(as.list(c(y, parms)), {
+    dP = r0*P*(1-P/K) - a*P*H/(1+P*a*h)
+    dH =  eps*a*P*H/(1+P*a*h) - m*H
+    list(c(dP,dH))
+  })
+}
+```
+
+
+```{r rma_pars}
+# Set the parameter values
+r0 = 0.5     # r0 = 0.1
+K = 7
+a=0.5
+eps=0.5
+m=0.5
+h=0.4
+pars = c(r0 = r0, a = a, eps = eps, m=m, h=h,K=K)
+
+# Set initial conditions for state variables
+yini = c(P=1,H=1) 
+
+
+# Set simulation time
+timestep = 0.1
+simtime = seq(0,150,by = timestep) 
+
+
+# Run the dynamics
+dyn = data.frame(ode(y = yini, times = simtime, func = rma_model, parms = pars, method = "rk4"))
+
+
+# Plot trajectories
+plot(dyn[, "time"], dyn[, "P"], col="chartreuse3",type = "l", ylim=range(dyn[,c("P","H")]), ylab = "density", xlab = "time", las = 1)
+lines(dyn[, "time"], dyn[, "H"], type = "l", col = "darkorange3")
+legend("topleft", c("P","H"), lty = 1, col = c("chartreuse3","darkorange3"), bty = "n")  
+
+```
+
+
