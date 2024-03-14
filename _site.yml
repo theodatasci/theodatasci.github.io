@@ -18,7 +18,7 @@ navbar:
     - text: "Courses"
       href: "#"
       menu:
-     - text: "DAY 1"
+      - text: "DAY 1"
       - text: "Sonia Kefi talk"
         href: "courses/theo-modeling/intro_why_models.html"
       - text: "Isabelle Gounand talk"
