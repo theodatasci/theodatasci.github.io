@@ -1,0 +1,398 @@
+---
+title: "Solution: Competitive lotka-volterra: fitting several time series at once"
+author: "Camille Saade"
+date: "17/05/2022"
+output: html_document
+---
+
+In this script, we fit a single model over all replicates.
+To illustrate the use of random effect, we'll assume that the growth rates $r_1$ and $r_2$ vary between replicates, but that that they are all drawn from the same distribution.
+Biologically, this could be the case if each replicate is a bloc of experiment done at different times of the year so that temperature and lighting might change a bit in the lab.
+
+# I - Data importation
+```{r}
+# cleaning the env:
+rm(list = ls())
+# loading libraries:
+library(rstan) #  for the stats
+library(ggplot2) # for some plots
+library(coda) # diagnostic of mcmc output
+library(deSolve) # to integrate ODEs
+```
+
+
+```{r}
+## importing data
+data = read.csv('Data/competiton_multi.csv')
+head(data)
+
+```
+
+
+```{r}
+ggplot(data = data) + 
+  geom_line(mapping = aes(x = time, y = n1, group = replicate), color = 'blue') +
+  geom_line(mapping = aes(x = time, y = n2, group = replicate), color = 'green') +
+  geom_point(mapping = aes(x = time, y = n1, group = replicate), color = 'blue') +
+  geom_point(mapping = aes(x = time, y = n2, group = replicate), color = 'green') +
+  facet_wrap(~species) +
+  theme_classic()
+```
+
+See the data structure above: we have time series from cocultures and monocultures of species 1 and 2, from 6 different replicates.
+To fit a model on all the data, we now use matrices (instead of vectors) for each time series, with the time in lines and replicates in columns:
+
+```{r}
+# data
+n = length(unique(data$time)) # number of observations
+m = length(unique(data$replicate)) # number of replicates
+t = unique(data$time) # times
+
+# creating n*m matrix for the observations
+n1_mono = matrix(0, n, m)
+n2_mono = matrix(0, n, m)
+n1 = matrix(0, n, m)
+n2 = matrix(0, n, m)
+
+for (k in 1:m){
+  n1_mono[,k] = data$n1[data$species == 'n1' & data$replicate == k] # monoculture of n1
+  n2_mono[,k] = data$n2[data$species == 'n2' & data$replicate == k] # monoculture of n2
+  n1[,k] = data$n1[data$species == 'coculture' & data$replicate == k] # cocultures
+  n2[,k] = data$n2[data$species == 'coculture' & data$replicate == k]
+}
+
+data_stan = list(
+  n = n,
+  m = m,
+  t = t,
+  n1_mono = n1_mono,
+  n2_mono = n2_mono,
+  n1 = n1,
+  n2 = n2
+)
+
+```
+
+# II - Model declaration
+```{r}
+
+model_str = '
+functions{
+  real[] odemodel(real t, real[] N, real[] p, real[] x_r, int[] x_i){
+    // p[1]=r1, p[2] = r2, p[3] = K1, p[4] = K2, p[5] = alpha1, p[6] = alpha2 
+    real dNdt[2]; 
+    dNdt[1] = p[1]*N[1]*(1 - (N[1] + p[5]*N[2])/p[3]);
+    dNdt[2] = p[2]*N[2]*(1 - (p[6]*N[1] + N[2])/p[4]);
+    return dNdt;
+  }
+}
+
+data{
+  int n; // number of observations
+  int m; // number of replicates
+  real t[n]; // time
+  real n1_mono[n, m]; // observations n1 in monoculture
+  real n2_mono[n, m]; // observations n2 in monoculture
+  real n1[n, m]; // observations n1
+  real n2[n, m]; // observations n2
+}
+
+parameters{
+  real<lower=0> r1_bar; // growth rate baseline
+  real<lower=0> r2_bar; // growth rate baseline
+  real<lower=0> r1[m]; // growth rate per replicate
+  real<lower=0> r2[m]; // growth rate per replicate
+  
+  real<lower=0> rsd; // growth rate variability between replicates
+  
+  real<lower=0> K1; // carrying capacity
+  real<lower=0> K2; // carrying capacity
+  real<lower=0> alpha1; // comp term
+  real<lower=0> alpha2; // comp term
+  real<lower=0> n10sim_mono[m]; // initial density n1
+  real<lower=0> n20sim_mono[m]; // initial density n2
+  real<lower=0> n10sim[m]; // initial density n1
+  real<lower=0> n20sim[m]; // initial density n2
+  real<lower=0> sdev;
+}
+
+model{
+  real p[6]; // vector of parameters for the ODE
+  real simval[n-1,2]; // simulated values, matrix. dim1 = time without t0, dim2 = dim_ODE = 2 (S = 1, I = 2)
+  
+  // priors 
+  r1_bar ~ lognormal(-0.5,1);
+  r2_bar ~ lognormal(-0.5,1);
+  rsd ~ gamma(2,0.1);
+  r1 ~ normal(r1_bar,rsd);
+  r2 ~ normal(r2_bar,rsd);
+  K1 ~ lognormal(5.5, 1);
+  K2 ~ lognormal(5.5, 1);
+  alpha1 ~ lognormal(0.5,1);
+  alpha2 ~ lognormal(0.5,1);
+  n10sim_mono ~ normal(n1_mono[1,],5);
+  n20sim_mono ~ normal(n2_mono[1,],5);
+  n10sim ~ normal(n1[1,],5);
+  n20sim ~ normal(n2[1,],5);
+  sdev ~ gamma(2,0.1);
+  
+  // parameters for integrator
+  p[3] = K1;
+  p[4] = K2;
+  p[5] = alpha1;
+  p[6] = alpha2;
+  // we will declare p[1] and p[2] in the replicates loop since they differ between replicates !
+  
+
+  for (j in 1:m){ // looping over replicates
+    p[1] = r1[j];
+    p[2] = r2[j];
+    // monoculture n1
+    // integrate ODE
+    simval = integrate_ode_rk45(odemodel, {n10sim_mono[j], 0}, t[1], t[2:n], p, rep_array(0.0,0), rep_array(0,0));
+    // likelihood
+    n1_mono[1, j] ~ normal(n10sim_mono[j], sdev);
+    for (i in 2:n){
+      n1_mono[i, j] ~ normal(simval[i-1, 1], sdev);
+    }
+    
+    // monoculture n2
+    // integrate ODE
+    simval = integrate_ode_rk45(odemodel, {0, n20sim_mono[j]}, t[1], t[2:n], p, rep_array(0.0,0), rep_array(0,0));
+    // likelihood
+    n2_mono[1, j] ~ normal(n20sim_mono[j], sdev);
+    for (i in 2:n){
+      n2_mono[i, j] ~ normal(simval[i-1, 2], sdev);
+    }
+    
+    // integrate ODE
+    simval = integrate_ode_rk45(odemodel, {n10sim[j], n20sim[j]}, t[1], t[2:n], p, rep_array(0.0,0), rep_array(0,0));
+    // likelihood
+    n1[1, j] ~ normal(n10sim[j], sdev);
+    n2[1, j] ~ normal(n20sim[j], sdev);
+    for (i in 2:n){
+      n1[i,j] ~ normal(simval[i-1, 1], sdev);
+      n2[i,j] ~ normal(simval[i-1, 2], sdev);
+    }
+  }
+}
+
+generated quantities{
+}
+'
+
+```
+
+Check the parameter bloc (l100-106) to see how we deal with the random effect:
+```
+parameters{
+  real<lower=0> r1_bar; // growth rate baseline
+  real<lower=0> r2_bar; // growth rate baseline
+  real<lower=0> r1[m]; // growth rate per replicate
+  real<lower=0> r2[m]; // growth rate per replicate
+  
+  real<lower=0> rsd; // growth rate variability between replicates
+```
+The parameters r1_bar and r2_bar are the average of r1 and r2 underlying distribution.
+r1 and r2 are now vectors of length m, since we fit a single r1 and r2 to each replicate.
+The last parameters we add is a standard deviation for the r between replicates: rsd.
+We also change the priors in the model bloc (l.123):
+
+```
+  // priors 
+  r1_bar ~ lognormal(-0.5,1);
+  r2_bar ~ lognormal(-0.5,1);
+  rsd ~ gamma(2,0.1);
+  r1 ~ normal(r1_bar,rsd);
+  r2 ~ normal(r2_bar,rsd);
+```
+For the average values r1_bar and r2_bar, we keep the same distribution as we would for the fixed effects: a lognormal distribution covering roughly 0-1.
+For the error term (rsd), we use a weakly informative gamma distribution that can get very close to 0 in case the r are very similar between replicates.
+Finally, the values of r1 and r2 are drawn from normal distribution centered on r1_bar and r2_bar.
+
+
+```{r}
+model = stan_model(model_code = model_str, auto_write = TRUE)
+```
+
+# III - Fit
+```{r}
+# stan options
+chains = 3
+options(mc.cores = chains)
+iter   =  2000
+warmup =  1000
+
+# initial values for sampling 
+init=rep(list(list(r1_bar=0.1,
+                   r2_bar=0.2,
+                   r1 = rep(0.1, m),
+                   r2 = rep(0.2, m),
+                   K1 = 300,
+                   K2 = 200,
+                   alpha1 = 1,
+                   alpha2 = 1,
+                   n10sim_mono=data_stan$n1_mono[1,],
+                   n20sim_mono=data_stan$n2_mono[1,],
+                   n10sim=data_stan$n1[1,],
+                   n20sim=data_stan$n2[1,],
+                   sdev=1
+                   ))
+         ,chains)
+
+
+fit = sampling(model,
+               data=data_stan,
+               iter=iter,
+               warmup=warmup,
+               chains=chains,
+               init=init)
+```
+
+# IV - Diagnostics
+```{r}
+print(fit, digits = 3)
+```
+
+```{r}
+samples=As.mcmc.list(fit)
+params = c("r1_bar","r2_bar", "K1", "K2", "alpha1", "alpha2")
+plot(samples[, params])
+```
+
+```{r}
+pairs(fit, pars=params)
+```
+
+# V- posterior predictions
+Let us first fit the predictions with the random effect:
+```{r}
+ode.model = function(t,N,p){
+  r1 = p$r1
+  r2 = p$r2
+  K1 = p$K1
+  K2 = p$K2
+  alpha1 = p$alpha1
+  alpha2 = p$alpha2
+  dn1 = r1*N[1]*(1-(N[1]+alpha1*N[2])/K1)
+  dn2 = r2*N[2]*(1-(alpha2*N[1]+N[2])/K2)
+  return(list(c(dn1, dn2)))
+}
+
+posteriors = as.matrix(fit)
+#
+n_post = 200
+times = seq(min(data$time), max(data$time), length.out = 200)
+for (k in 1:n_post){
+  par = posteriors[sample(1:nrow(posteriors), 1),]
+  for (replicate in 1:m){
+    ## coculture predictions
+    sim = ode(c(par[paste0('n10sim[', replicate, ']')], par[paste0('n20sim[', replicate, ']')]),
+            times, ode.model, list(r1 = par[paste0('r1[', replicate, ']')] , r2= par[paste0('r2[', replicate, ']')] , K1 = par['K1'], K2 = par['K2'], alpha1 = par['alpha1'], alpha2 = par['alpha2']))
+  
+    temp  = data.frame(time = sim[,1], n1 = sim[,2], n2 = sim[,3], id = k, replicate = replicate, species = 'coculture')
+    
+    ## n1 monoculture predictions
+    sim = ode(c(par[paste0('n10sim_mono[', replicate, ']')], 0),
+            times, ode.model, list(r1 = par[paste0('r1[', replicate, ']')] , r2= par[paste0('r2[', replicate, ']')] , K1 = par['K1'], K2 = par['K2'], alpha1 = par['alpha1'], alpha2 = par['alpha2']))
+  
+    temp  = rbind(temp, data.frame(time = sim[,1], n1 = sim[,2], n2 = sim[,3], id = k, replicate = replicate, species = 'n1'))
+    
+    ## n2 monoculture predictions
+    sim = ode(c(0, par[paste0('n20sim_mono[', replicate, ']')]),
+            times, ode.model, list(r1 = par[paste0('r1[', replicate, ']')] , r2= par[paste0('r2[', replicate, ']')] , K1 = par['K1'], K2 = par['K2'], alpha1 = par['alpha1'], alpha2 = par['alpha2']))
+  
+    temp  = rbind(temp, data.frame(time = sim[,1], n1 = sim[,2], n2 = sim[,3], id = k, replicate = replicate, species = 'n2'))
+  
+    if (k == 1 & replicate == 1){
+      predictions = temp
+    } else {
+      predictions = rbind(predictions, temp)
+    }
+  }
+}
+```
+
+
+```{r}
+ggplot(data) +
+  geom_point(mapping = aes(x = time, y = n1), color = 'blue') +
+  geom_point(mapping = aes(x = time, y = n2), color = 'red') +
+  stat_summary(data = predictions, mapping = aes(x = time, y = n1),
+               fun.min = function(x) quantile(x, 0.05),
+               fun.max = function(x) quantile(x, 0.95),
+               geom = 'ribbon', fill = 'blue', alpha = 0.2) +
+  stat_summary(data = predictions, mapping = aes(x = time, y = n1),
+               fun = median,
+               geom = 'line', color = 'blue') +
+  stat_summary(data = predictions, mapping = aes(x = time, y = n2),
+               fun.min = function(x) quantile(x, 0.05),
+               fun.max = function(x) quantile(x, 0.95),
+               geom = 'ribbon', fill = 'red', alpha = 0.2) +
+  stat_summary(data = predictions, mapping = aes(x = time, y = n2),
+               fun = median,
+               geom = 'line', color = 'red') +
+  facet_grid(species~replicate) +
+  theme_classic()
+```
+And with the estimated average (r1_bar and r2_bar):
+
+
+
+```{r}
+n_post = 200
+times = seq(min(data$time), max(data$time), length.out = 200)
+for (k in 1:n_post){
+  par = posteriors[sample(1:nrow(posteriors), 1),]
+  for (replicate in 1:m){
+    ## coculture predictions
+    sim = ode(c(par[paste0('n10sim[', replicate, ']')], par[paste0('n20sim[', replicate, ']')]),
+            times, ode.model, list(r1 = par['r1_bar'] , r2= par['r2_bar'] , K1 = par['K1'], K2 = par['K2'], alpha1 = par['alpha1'], alpha2 = par['alpha2']))
+  
+    temp  = data.frame(time = sim[,1], n1 = sim[,2], n2 = sim[,3], id = k, replicate = replicate, species = 'coculture')
+    
+    ## n1 monoculture predictions
+    sim = ode(c(par[paste0('n10sim_mono[', replicate, ']')], 0),
+            times, ode.model, list(r1 = par['r1_bar'] , r2= par['r2_bar'] , K1 = par['K1'], K2 = par['K2'], alpha1 = par['alpha1'], alpha2 = par['alpha2']))
+  
+    temp  = rbind(temp, data.frame(time = sim[,1], n1 = sim[,2], n2 = sim[,3], id = k, replicate = replicate, species = 'n1'))
+    
+    ## n2 monoculture predictions
+    sim = ode(c(0, par[paste0('n20sim_mono[', replicate, ']')]),
+            times, ode.model, list(r1 = par['r1_bar'] , r2= par['r2_bar'] , K1 = par['K1'], K2 = par['K2'], alpha1 = par['alpha1'], alpha2 = par['alpha2']))
+  
+    temp  = rbind(temp, data.frame(time = sim[,1], n1 = sim[,2], n2 = sim[,3], id = k, replicate = replicate, species = 'n2'))
+  
+    if (k == 1 & replicate == 1){
+      predictions_average = temp
+    } else {
+      predictions_average = rbind(predictions_average, temp)
+    }
+  }
+}
+```
+
+
+```{r}
+ggplot(data) +
+  geom_point(mapping = aes(x = time, y = n1), color = 'blue') +
+  geom_point(mapping = aes(x = time, y = n2), color = 'red') +
+  stat_summary(data = predictions_average, mapping = aes(x = time, y = n1),
+               fun.min = function(x) quantile(x, 0.05),
+               fun.max = function(x) quantile(x, 0.95),
+               geom = 'ribbon', fill = 'blue', alpha = 0.2) +
+  stat_summary(data = predictions_average, mapping = aes(x = time, y = n1),
+               fun = median,
+               geom = 'line', color = 'blue') +
+  stat_summary(data = predictions_average, mapping = aes(x = time, y = n2),
+               fun.min = function(x) quantile(x, 0.05),
+               fun.max = function(x) quantile(x, 0.95),
+               geom = 'ribbon', fill = 'red', alpha = 0.2) +
+  stat_summary(data = predictions_average, mapping = aes(x = time, y = n2),
+               fun = median,
+               geom = 'line', color = 'red') +
+  facet_grid(species~replicate) +
+  theme_classic()
+```
+
+
