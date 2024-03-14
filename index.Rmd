@@ -90,7 +90,7 @@ is to train young researchers in theory-based approaches to model ecological dat
     <td>Icebreaker & Introduction to the week</td>
   </tr>
   <tr style="background-color:#f0f2ed">
-    <td>Mathematical modeling & Theory <span class="btn"><a href="courses/theo-modeling/TAED_2023_ModelPanorama.pdf">SLIDES</a></span><span class="btn"><a href="courses/theo-modeling/course_Day1_linking_theory_data.pdf">SLIDES</a></span></td>
+    <td>Mathematical modeling & Theory <span class="btn"><a href="courses/theo-modeling/intro_why_models.html">SLIDES</a></span><span class="btn"><a href="courses/theo-modeling/TAED_2024_DEF2.pdf">SLIDES</a></span></td>
   </tr>
   <tr style="background-color:#f0f2ed">
     <td>**_Guest seminar_**: Kim Cuddington (Waterloo Univ., Canada) <span class="btn"><a href="https://www.ecotheory.ca/theorydata/datatheory.html">SLIDES</a></span></td>
@@ -109,7 +109,7 @@ is to train young researchers in theory-based approaches to model ecological dat
     <td>**_Speakers_**: Vincent Calcagno & Quentin Petitjean</td>
   </tr>
   <tr style="background-color:#f0f2ed">
-    <td>Spatial data, macro-ecology and co-occurrences <span class="btn"><a href="courses/spatial-data/TDAED_slides.pdf">SLIDES</a></span></td>
+    <td>Spatial data, macro-ecology and co-occurrences <span class="btn"><a href="courses/spatial-data/TDAED_day3_slides_2024.pdf">SLIDES</a></span></td>
   </tr>
   <tr style="background-color:#f0f2ed">
     <td>**_Guest seminar_**: Davide Martinetti (INRAE, Avignon) <span class="btn"><a href="courses/spatial-data/Martinetti_SDM_PopilliaJaponica2.pdf">SLIDES</a></span></td>
