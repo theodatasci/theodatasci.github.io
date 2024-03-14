@@ -6,7 +6,7 @@ base_url: https://theodatasci.github.io
 repository_url: https://github.com/theodatasci/theodatasci.github.io
 creative_commons: CC BY
 favicon: img/favicon.png
-output_dir: "."
+output_dir: "_site"
 navbar:
   logo:
     image: img/logo-theodatasci_150dpi.png

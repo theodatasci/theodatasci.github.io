@@ -2,11 +2,14 @@ on:
   push:
     branches: main
 
+permissions:
+  contents: write
+
 name: Render & Deploy Site
 
 jobs:
   build:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -23,8 +26,9 @@ jobs:
 
       - name: Render Site
         run: Rscript -e 'rmarkdown::render_site(encoding = "UTF-8")'
-      - name: Commit results
-        run: |
-          git add -A
-          git commit -m 'Rebuild site' || echo "No changes to commit"
-          git push origin || echo "No changes to commit"
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: "_site" # The folder the action should deploy.
