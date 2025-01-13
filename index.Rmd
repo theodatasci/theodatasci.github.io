@@ -7,11 +7,6 @@ description:  |
     <img class="logo" src="https://raw.githubusercontent.com/theodatasci/.github/main/profile/banner-theodatasci_150dpi.png" style="width: 100%;" />
   </a>
 author:
-  - name: "Nicolas Casajus"
-    url: https://nicolascasajus.fr
-    affiliation: FRB-CESAB
-    affiliation_url: https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/
-    orcid_id: 0000-0002-5537-5294
   - name: "Vincent Calcagno"
     url: https://vcalcagnoresearch.wordpress.com/
     affiliation: INRAE Institut Sophia Agrobiotech
@@ -90,18 +85,31 @@ is to train young researchers in theory-based approaches to model ecological dat
     <td>Icebreaker & Introduction to the week</td>
   </tr>
   <tr style="background-color:#f0f2ed">
-    <td>Mathematical modeling & Theory <span class="btn"><a href="courses/theo-modeling/intro_why_models.html">SLIDES</a></span><span class="btn"><a href="courses/theo-modeling/TAED_2024_DEF2.pdf">SLIDES</a></span><span class="btn"><a href="courses/theo-modeling/TDAED_stats_2024.pdf">SLIDES</a></span></td>
+    <td>Mathematical modeling & Theory
+    
+  <!--
+      <span class="btn"><a href="courses/theo-modeling/intro_why_models.html">SLIDES</a></span><span class="btn"><a href="courses/theo-modeling/TAED_2024_DEF2.pdf">SLIDES</a></span><span class="btn"><a href="courses/theo-modeling/TDAED_stats_2024.pdf">SLIDES</a></span>
+  -->
+    </td>
   </tr>
+  
+  <!--
   <tr style="background-color:#f0f2ed">
     <td>**_Guest seminar_**: Kim Cuddington (Waterloo Univ., Canada) <span class="btn"><a href="https://www.ecotheory.ca/theorydata/datatheory.html">SLIDES</a></span></td>
   </tr>
+  -->
   
   <tr>
     <td rowspan="2">**Tuesday**</td>
     <td>**_Speakers_**: Emanuel Fronhofer & Jhelam Deshpande </td>
   </tr>
   <tr>
-    <td>Temporal series and dynamics in ecology <span class="btn"><a href="time-series/emmanuel/fronhofer_day2_cesab_theomodive.pdf">SLIDES</a></span></td>
+    <td>Temporal series and dynamics in ecology
+    
+  <!--
+    <span class="btn"><a href="time-series/emmanuel/fronhofer_day2_cesab_theomodive.pdf">SLIDES</a></span>
+  -->
+    </td>
   </tr>
 
   <tr style="background-color:#f0f2ed">
@@ -109,10 +117,22 @@ is to train young researchers in theory-based approaches to model ecological dat
     <td>**_Speakers_**: Vincent Calcagno & Quentin Petitjean</td>
   </tr>
   <tr style="background-color:#f0f2ed">
-    <td>Spatial data, macro-ecology and co-occurrences <span class="btn"><a href="courses/spatial-data/TDAED_day3_slides_2024.pdf">SLIDES</a></span></td>
+    <td>Spatial data, macro-ecology and co-occurrences
+    
+  <!--
+    <span class="btn"><a href="courses/spatial-data/TDAED_day3_slides_2024.pdf">SLIDES</a></span>
+  -->
+  
+  </td>
   </tr>
+  
   <tr style="background-color:#f0f2ed">
-    <td>**_Guest seminar_**: Davide Martinetti (INRAE, Avignon) <span class="btn"><a href="courses/spatial-data/Martinetti_SDM_PopilliaJaponica2.pdf">SLIDES</a></span></td>
+    <td>**_Guest seminar_**: Davide Martinetti (INRAE, Avignon)
+    
+  <!--
+    <span class="btn"><a href="courses/spatial-data/Martinetti_SDM_PopilliaJaponica2.pdf">SLIDES</a></span>
+  -->
+    </td>
   </tr>
   
   <tr>
@@ -120,13 +140,31 @@ is to train young researchers in theory-based approaches to model ecological dat
     <td>**_Speakers_**: François Massol & Claire Jacquet</td>
   </tr>
   <tr>
-    <td>Interaction networks, trophic networks & complexity <span class="btn"><a href="courses/networks/Day4_Networks_2023.pdf">SLIDES</a></span><span class="btn"><a href="courses/networks/Claire/empirical_food_webs_2023.pdf">SLIDES</a></span></td>
+    <td>Interaction networks, trophic networks & complexity
+    
+  <!--
+  <span class="btn"><a href="courses/networks/Day4_Networks_2023.pdf">SLIDES</a></span><span class="btn"><a href="courses/networks/Claire/empirical_food_webs_2023.pdf">SLIDES</a></span>
+  -->
+  
+  </td>
   </tr>
-   <tr>
-    <td>**_Guest speaker_**: Matthieu Barbier (CIRAD, Montpellier & INTP) <span class="btn"><a href="courses/networks/matthieu/MB_cesab.pdf">SLIDES</a></span></td>
+  
+  <tr>
+    <td>**_Guest speaker_**: Matthieu Barbier (CIRAD, Montpellier & INTP)
+    
+  <!--
+      <span class="btn"><a href="courses/networks/matthieu/MB_cesab.pdf">SLIDES</a></span>
+  -->
+  
+  </td>
   </tr>
   <tr>
-    <td>**_Guest seminar_**: Sonia Kéfi (CNRS, Montpellier) <span class="btn"><a href="courses/networks/2022_05_cesab_Kefi.pdf">SLIDES</a></span></td>
+    <td>**_Guest seminar_**: Sonia Kéfi (CNRS, Montpellier)
+    
+  <!--
+  <span class="btn"><a href="courses/networks/2022_05_cesab_Kefi.pdf">SLIDES</a></span>
+  -->
+  </td>
   </tr>
   
   <tr style="background-color:#f0f2ed">
@@ -162,5 +200,5 @@ Discover the other training courses provided by the FRB-CESAB and its partners: 
 
 
 
-Casajus N, Calcagno V, Fronhofer EA, Gounand I, Jacquet C, Kéfi C & Massol F (2024) 
+Calcagno V, Fronhofer EA, Gounand I, Jacquet C, Kéfi C & Massol F (2025) 
 FRB-CESAB & GdR TheoMoDive training course: Theory-driven analysis for ecological data. 
