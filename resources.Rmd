@@ -55,9 +55,6 @@ knitr::opts_chunk$set(echo = FALSE)
 - Dunne JA, Williams RJ & Martinez ND (2002) Network structure and biodiversity loss in food webs: robustness increases with connectance. **_Ecology Letters_**, doi: [10.1046/j.1461-0248.2002.00354.x](https://doi.org/10.1046/j.1461-0248.2002.00354.x).
 &nbsp;[**PDF**](biblio/dunne-2002.pdf)
 
-- Grainger TN _et al._ (2022) An empiricist’s guide to using ecological theory. **_The American Naturalist_**, doi: [10.1086/717206](https://doi.org/10.1086/717206).
-&nbsp;[**PDF**](biblio/grainger-2022.pdf)
-
 - James A _et al._ (2015) Constructing random matrices to represent real ecosystems. **_The American Naturalist_**, doi: [10.1086/680496](https://doi.org/10.1086/680496).
 &nbsp;[**PDF**](biblio/james-2015.pdf)
 
