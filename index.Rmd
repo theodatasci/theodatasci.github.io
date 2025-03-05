@@ -198,7 +198,9 @@ is to train young researchers in theory-based approaches to model ecological dat
 
 ## Prerequisites
 
-If you want ready-to-use working environment for R, follow this [tutorial](https://frbcesab.github.io/rsetup). For this course, you don't need to install `git` and `Docker`.
+If you want ready-to-use working environment for R, follow this [tutorial](https://frbcesab.github.io/rsetup). For this course, you just need to install [`R`](https://cran.r-project.org/) and [`RStudio`](https://posit.co/download/rstudio-desktop/) (optional).
+
+You also need to install R package [`RStan`](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started).
 
 
 <br/>
@@ -208,7 +210,7 @@ If you want ready-to-use working environment for R, follow this [tutorial](https
 ## See also
 
 
-Discover the other training courses provided by the FRB-CESAB and its partners: <https://frbcesab.github.io/training-courses/>
+Discover the other training courses provided by the FRB-CESAB and its partners: <https://frbcesab.github.io/content/courses.html>
 
 
 
