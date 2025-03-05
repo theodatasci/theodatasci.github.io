@@ -61,9 +61,7 @@ The objective of this five-day workshop, co-organized by the
 [FRB-CESAB](https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/) 
 and the 
 [GdR TheoMoDive](https://sete-moulis-cnrs.fr/en/research/centre-for-biodiversity-theory-and-modelling/theomodive)
-is to train young researchers in theory-based approaches to model ecological data 
-(e.g. temporal series, macroecology, interaction and trophic network, etc.).
-
+is to train young researchers in building and analyzing mathematical models that will help them better understand ecological data. By contrast with purely statistical models, **this course emphasizes a process-driven approach based on ecological theory**. The course covers a general introduction to ecological modeling and thematic sessions focused on three topics of interest (time series, spatial data, interaction networks). Each topic is explored through mathematical models as well as inferential and predictive approaches, with a mix of courses and practical.
 
 **N.B.** This training course is **in English** and slides are available in the tab `Courses/`.
 
@@ -198,9 +196,9 @@ is to train young researchers in theory-based approaches to model ecological dat
 
 ## Prerequisites
 
-If you want ready-to-use working environment for R, follow this [tutorial](https://frbcesab.github.io/rsetup). For this course, you just need to install [`R`](https://cran.r-project.org/) and [`RStudio`](https://posit.co/download/rstudio-desktop/) (optional).
+For this course, you need to install [`R`](https://cran.r-project.org/) and [`RStudio`](https://posit.co/download/rstudio-desktop/) (optional).
 
-You also need to install R package [`RStan`](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started).
+You also need to install the R package [`RStan`](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started).
 
 
 <br/>
