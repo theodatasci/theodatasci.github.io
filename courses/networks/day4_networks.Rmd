@@ -137,7 +137,7 @@ plot(degree_distribution(net.mat, cumulative = TRUE))
 Connectance is an important notion. It is defined as the proportion of possible interactions that really exist. There are plenty of ways to implement its computation (e.g. using mean), but it is important to correct these according to the impossible interactions (e.g. correcting for self-links or edges within levels in bipartite networks).
 
 ```{r}
-conn<-mean(as.matrix(net.mat[,]))
+conn<-mean(as.matrix(net.mat[,]))*(vcount(net.mat)/(vcount(net.mat)-1))
 conn
 ```
 
