@@ -43,6 +43,8 @@ knitr::opts_chunk$set(echo = FALSE)
 
 - Akjouj, I., Barbier, M., Clenet, M., Hachem, W., Maïda, M., Massol, F., Najim, J. & Tran, V. C. (2024) Complex systems in ecology: a guided tour with large Lotka–Volterra models and random matrices. **_Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences_**, 480, 20230284.
 
+- Byrnes, J. E. K. & Dee, L. E. (2025) Causal inference with observational data and unobserved confounding variables. **_Ecology Letters_**, 28, e70023. doi: [10.1111/ele.70023](https://doi.org/10.1111/ele.70023)
+
 - Cohen JE & Briand F (1984) Trophic links of community foodwebs. **_PNAS_**, doi: [10.1073/pnas.81.13.4105](https://doi.org/10.1073/pnas.81.13.4105).
 &nbsp;[**PDF**](biblio/cohen-1984.pdf)
 
