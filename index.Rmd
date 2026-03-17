@@ -1,7 +1,7 @@
 ---
 title: "Theory-driven analysis for ecological data"
 description:  |
-  FRB-CESAB & GdR TheoMoDive training course
+  FRB-CESAB & GdR TheoMoDive training course, with the support of the PEPR MathsVives
   <br><br>
   <a href="https://www.fondationbiodiversite.fr/en/the-frb-in-action/programs-and-projects/le-cesab/develop-skills/theory-driven-analysis-of-ecological-data/">
     <img class="logo" src="https://raw.githubusercontent.com/theodatasci/.github/main/profile/banner-theodatasci_150dpi.png" style="width: 100%;" />
