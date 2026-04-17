@@ -27,6 +27,8 @@ navbar:
         href: "courses/theo-modeling/TAED_Course_Day1_2026_Isabelle.R"
       - text: "Vincent Calcagno's talk"
         href: "courses/theo-modeling/TDAED_stats_2024.pdf"
+      - text: "Peter B. Alder's talk"
+        href: "courses/theo-modeling/Adler_EcoAcclimation_Modeling.pdf"
       - text: "bonus from earlier editions: Sally Otto's talk"
         href: "https://www.youtube.com/watch?v=1xD7BAOKllw"
       - text: "bonus from earlier editions: Kim Cuddington's talk"
